@@ -1,6 +1,8 @@
-from pydantic import Json
-from typing import Union, Optional, GenericAlias, _UnionGenericAlias
-from collections.abc import Mapping, Iterable
+from collections.abc import Iterable, Mapping
+from typing import GenericAlias, Optional, Union, _UnionGenericAlias
+
+from pydantic import Json, parse_obj_as, ValidationError
+
 
 generic_aliases = (GenericAlias, _UnionGenericAlias)
 
@@ -38,3 +40,13 @@ def apply_parsing_rules(type_):
                 ]
     else:
         return Union[type_, Json[type_]]
+
+
+class ParseError(Exception): pass
+
+
+def parse(type_, value):
+    try:
+        return parse_obj_as(apply_parsing_rules(type_), value)
+    except ValidationError as error:
+        raise ParseError(f'`{repr(value)}` could not be parsed as `{type_}`') from error
