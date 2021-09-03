@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Mapping
 from typing import GenericAlias, Optional, Union, _UnionGenericAlias
 
-from pydantic import Json, parse_obj_as, ValidationError
+from pydantic import Json, constr, parse_obj_as, ValidationError
 
 
 generic_aliases = (GenericAlias, _UnionGenericAlias)
@@ -9,7 +9,7 @@ generic_aliases = (GenericAlias, _UnionGenericAlias)
 
 def apply_parsing_rules(type_):
     if type_ is str:
-        return Union[Json[str], str]  # Json[str] parses b'"hello"' as 'hello'
+        return Union[Json[constr(strict=True)], str]  # Json[str] parses b'"hello"' as 'hello'
 
     elif type_ is type(None):
         return Union[None, Json[None]]  #Json[None] parses b'null' as None
