@@ -1,5 +1,5 @@
 import hypothesis.strategies as st
-from hypothesis import given
+from hypothesis import given, settings, Verbosity
 import json
 from typing import Union
 
@@ -29,7 +29,7 @@ def union_type(draw, type_strategy):
 complex_type =  st.recursive(
     primitive_type, 
     lambda children: generic_list_type(children) | generic_dict_type(st.just(str), children),  #| union_type(children), 
-    max_leaves=5
+    max_leaves=4
 )
 
 @st.composite
@@ -39,8 +39,26 @@ def type_and_value(draw, type_strategy):
     return type_, value
 
 
-
+@settings(max_examples=1000)
 @given(example=type_and_value(complex_type))
 def test_parse_values_unchanged(example):
     type_, value = example
     assert value == parse(type_, value)
+
+@settings(max_examples=1000)
+@given(example=type_and_value(complex_type))
+def test_parse_values_from_json(example):
+    type_, value = example
+    assert value == parse(type_, json.dumps(value))
+
+@settings(max_examples=1000)
+@given(example=type_and_value(generic_list_type(complex_type)))
+def test_parse_values_from_list(example):
+    type_, value = example
+    assert value == parse(type_, [json.dumps(x) for x in value])
+
+@settings(max_examples=1000)
+@given(example=type_and_value(generic_dict_type(st.just(str), complex_type)))
+def test_parse_values_from_dict(example):
+    type_, value = example
+    assert value == parse(type_, {json.dumps(k):json.dumps(v) for k, v in value.items()})
