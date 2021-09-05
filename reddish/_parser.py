@@ -1,12 +1,12 @@
 from collections.abc import Iterable, Mapping
 from typing import GenericAlias, Optional, Union, _UnionGenericAlias
-
+from functools import lru_cache
 from pydantic import Json, constr, parse_obj_as, ValidationError
 
 
 generic_aliases = (GenericAlias, _UnionGenericAlias)
 
-
+@lru_cache(maxsize=2048)
 def apply_parsing_rules(type_):
     if type_ is str:
         return Union[Json[constr(strict=True)], str]  # Json[str] parses b'"hello"' as 'hello'
