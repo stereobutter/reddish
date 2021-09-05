@@ -2,6 +2,17 @@ from typing import Union, Iterable
 from pydantic.json import pydantic_encoder
 import json
 
+def to_resp_array(*parts: bytes):
+    """Builds a RESP request"""
+    
+    request = bytearray(b'*%d\r\n' % len(parts))
+
+    for part in parts:
+        request += b'$%d\r\n' % len(part)
+        request +=b'%b\r\n' % part
+
+    return request
+
 def to_bytes(arg: Union[str, bytes]):
     if isinstance(arg, bytes):
         return arg
