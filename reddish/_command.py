@@ -49,3 +49,33 @@ class Command:
     def _dump(self):
         return [self._dump_parts()]
 
+
+OK = b'OK'
+QUEUED = b'QUEUED'
+
+class MultiExec:
+    """Class for wrapping commands into a redis MULTI and EXEC transaction"""
+
+    def __init__(self, *commands: Command):
+        self._commands = commands
+
+    def _dump(self):
+        return [[b'MULTI'], *[cmd._dump_parts() for cmd in self._commands], [b'EXEC']]
+
+    def _parse_response(self, *responses):
+        assert len(responses) == len(self._commands) + 2; "Got wrong number of replies from pipeline"
+
+        multi, *acks, replies = responses
+
+        if not multi == OK:
+            raise ValueError("Got '{multi} from MULTI instead of {OK} ")
+
+        if isinstance(transaction_error:= replies, Exception):
+            causes = [(i, resp) for i, resp in enumerate(acks) if not resp == QUEUED]
+            output = [transaction_error for _ in self._commands]
+            for i, cause in causes:
+                output[i] = cause
+            return output
+
+        assert len(replies) == len(self._commands), "Got wrong number of replies from transaction"
+        return [cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)]
