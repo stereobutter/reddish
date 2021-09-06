@@ -31,7 +31,7 @@ redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 foo = await redis.execute(Command('GET', 'foo'))
 
 # execute multiple redis commands at once
-foo = await redis.execute(Command('GET', 'foo'), Command('GET', 'bar'))
+foo, bar = await redis.execute(Command('GET', 'foo'), Command('GET', 'bar'))
 ```
 
 ### Transactions
@@ -43,7 +43,7 @@ from reddish import MultiExec
     MultiExec(
         Command('SET', 'bar', 1),
         Command('SET', 'baz', 2)
-        )
+        ),
     Command('GET', 'zap')
     )
 ```
