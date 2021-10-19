@@ -22,8 +22,6 @@ class Command:
     def _parse_response(self, response):
         if self._model is Any:  # skip parsing
             return response
-        if isinstance(response, Exception):
-            return response
         try:
             return parse(self._model, response)
         except ParseError as error:
