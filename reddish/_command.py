@@ -1,4 +1,3 @@
-from typing import Any
 from ._parser import parse, ParseError
 from ._utils import to_bytes, json_dumps
 
@@ -7,7 +6,7 @@ class Command:
 
     def __init__(self, *parts):
         """Accepts strings and data to form a redis command"""
-        self._model = Any
+        self._models = ()
         self._parts = parts
 
     def __repr__(self):
@@ -16,16 +15,21 @@ class Command:
 
     def into(self, model, /):
         """Parse the reponse into the provided type"""
-        self._model = model
-        return self
+        new = type(self)(*self._parts)
+        new._models = (*self._models, model)
+        return new
 
     def _parse_response(self, response):
-        if self._model is Any:  # skip parsing
+        if not self._models:  # skip parsing
             return response
-        try:
-            return parse(self._model, response)
-        except ParseError as error:
-            return error
+
+        for model in self._models:
+            try:
+                response = parse(model, response)
+            except ParseError as error:
+                return error
+
+        return response
 
     def _dump_parts(self):
         for part in self._parts:
