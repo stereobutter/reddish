@@ -5,17 +5,10 @@ from ._utils import to_bytes, json_dumps
 class Command:
     """Class for specifing a single redis command"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *parts):
         """Accepts strings and data to form a redis command"""
         self._model = Any
-        try:
-            self._parts = self._make(*args, **kwargs)
-        except TypeError as error:
-            raise error from None
-
-    def _make(self, *args):
-        """Method for overriding in custom command classes"""
-        return args
+        self._parts = parts
 
     def __repr__(self):
         parts = ((part if isinstance(part, (str, bytes)) else f'`{part}`' for part in self._parts))
@@ -37,14 +30,11 @@ class Command:
             return error
 
     def _dump_parts(self):
-        parts = []
         for part in self._parts:
             if isinstance(part, (str, bytes)):
-                parts.append(to_bytes(part))
+                yield to_bytes(part)
             else:
-                parts.append(to_bytes(json_dumps(part)))
-
-        return parts
+                yield to_bytes(json_dumps(part))
 
     def _dump(self):
         return [self._dump_parts()]
