@@ -1,13 +1,21 @@
+from copy import copy
 from ._parser import parse, ParseError
 from ._utils import to_bytes, json_dumps
+from ._templating import apply_template
+
 
 class Command:
     """Class for specifing a single redis command"""
 
-    def __init__(self, *parts):
+    def __init__(self, template, *args, **kwargs):
         """Accepts strings and data to form a redis command"""
+        self._parts = apply_template(template, *args, **kwargs)
+
+        for part in self._parts:
+            if not isinstance(part, (int, float, str, bytes)):
+                raise ValueError(f"''{repr(part)} is not valid as part of a command")
+
         self._models = ()
-        self._parts = parts
 
     def __repr__(self):
         parts = ((part if isinstance(part, (str, bytes)) else f'`{part}`' for part in self._parts))
@@ -15,7 +23,7 @@ class Command:
 
     def into(self, model, /):
         """Parse the reponse into the provided type"""
-        new = type(self)(*self._parts)
+        new = copy(self)
         new._models = (*self._models, model)
         return new
 
@@ -33,10 +41,7 @@ class Command:
 
     def _dump_parts(self):
         for part in self._parts:
-            if isinstance(part, (str, bytes)):
-                yield to_bytes(part)
-            else:
-                yield to_bytes(json_dumps(part))
+            yield to_bytes(part)
 
     def _dump(self):
         return [self._dump_parts()]
