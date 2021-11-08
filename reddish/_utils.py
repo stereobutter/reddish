@@ -14,11 +14,13 @@ def to_resp_array(*parts: bytes):
 
     return request
 
-def to_bytes(arg: Union[str, bytes]):
+def to_bytes(arg: Union[str, bytes, int, float]):
     if isinstance(arg, bytes):
         return arg
     elif isinstance(arg, str):
         return arg.encode('utf-8')
+    elif isinstance(arg, (int, float)):
+        return str(arg).encode('utf-8')
     else:
         raise TypeError(f"'{arg}' cannot be cast into bytes.")
 
