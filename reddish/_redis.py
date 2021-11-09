@@ -7,6 +7,19 @@ from ._utils import to_resp_array, partition
 from ._errors import ConnectionClosedError
 
 
+UNSUPPORTED_COMMANDS = (
+    'SUBSCRIBE',
+    'UNSUBSCRIBE'
+    'PSUBSCRIBE',
+    'PUNSUBSCRIBE',
+    'MONITOR'
+)
+
+
+class UnsupportedCommandError(Exception): 
+    pass
+
+
 class Redis:
 
     def __init__(self, stream: Stream):
