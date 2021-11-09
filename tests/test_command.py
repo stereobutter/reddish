@@ -1,6 +1,7 @@
 import pytest
 from hypothesis import given
 import hypothesis.strategies as st
+import hiredis
 from .strategies import type_and_value, complex_type
 
 from reddish._command import Command, MultiExec
@@ -11,6 +12,10 @@ def test_command_parses_data(example):
     assert value == Command('').into(type_)._parse_response(value)
 
 
+def test_command_serialization():
+    reader = hiredis.Reader()
+    reader.feed(bytes(Command('SET {foo} {bar}', foo='foo', bar='bar')))
+    assert [b'SET', b'foo', b'bar'] == reader.gets()
 
 @given(num=st.integers(min_value=0, max_value=1000))
 def test_multi_exec_dump(num):
