@@ -36,7 +36,7 @@ class Command:
 
         for part in self._parts:
             if not isinstance(part, (int, float, str, bytes, Args)):
-                raise ValueError(f"''{repr(part)} is not valid as part of a command")
+                raise ValueError(f"'{repr(part)}' is not valid as part of a command")
 
         self._models = ()
 
