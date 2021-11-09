@@ -15,6 +15,10 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
+    def __iter__(self):
+        for part in self._parts:
+            yield to_bytes(part)
+
 
     @classmethod
     def from_dict(cls, /, mapping):
