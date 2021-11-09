@@ -2,7 +2,7 @@ from itertools import chain
 from trio.abc import Stream
 from hiredis import Reader
 
-from ._command import Command
+from ._command import Command, MultiExec
 from ._utils import to_resp_array, partition
 from ._errors import ConnectionClosedError
 
@@ -30,6 +30,18 @@ class Redis:
     async def execute(self, command: Command, /, *commands: Command):
 
         commands = (command, *commands)
+
+        def guard(command):
+            if cmd._command_name in UNSUPPORTED_COMMANDS:
+                raise UnsupportedCommandError(f"The '{cmd._command_name}' command is not supported.")
+
+        for cmd in commands:
+            if isinstance(tx := cmd, MultiExec):
+                for cmd in tx:
+                    guard(cmd)
+            else:
+                guard(cmd)
+
         await self._stream.send_all(b''.join(bytes(cmd) for cmd in commands))
 
         expected_num_replies = [len(cmd) for cmd in commands]
