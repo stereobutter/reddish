@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from itertools import chain
 from copy import copy
 from ._parser import parse, ParseError
-from ._utils import to_bytes, json_dumps
+from ._utils import to_bytes, to_resp_array
 from ._templating import apply_template
 
 
@@ -62,16 +62,18 @@ class Command:
 
         return response
 
-    def _dump_parts(self):
+    def __len__(self):
+        return 1
+
+    def __bytes__(self):
+        parts = []
         for part in self._parts:
             if isinstance(part, Args):
-                for sub_part in part._parts:
-                    yield to_bytes(sub_part)
+                for sub_part in part:
+                    parts.append(sub_part)
             else:
-                yield to_bytes(part)
-
-    def _dump(self):
-        return [self._dump_parts()]
+                parts.append(to_bytes(part))
+        return to_resp_array(*parts)
 
 
 OK = b'OK'
