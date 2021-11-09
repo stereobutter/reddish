@@ -83,11 +83,18 @@ QUEUED = b'QUEUED'
 class MultiExec:
     """Class for wrapping commands into a redis MULTI and EXEC transaction"""
 
+    _MULTI = to_resp_array(b'MULTI')
+    _EXEC = to_resp_array(b'EXEC')
+
     def __init__(self, *commands: Command):
         self._commands = commands
 
-    def _dump(self):
-        return [[b'MULTI'], *[cmd._dump_parts() for cmd in self._commands], [b'EXEC']]
+    def __len__(self):
+        return 2 + len(self._commands)  # MULTI cmds... EXEC
+
+    def __bytes__(self):
+        commands = b''.join(bytes(cmd) for cmd in self._commands)
+        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
 
     def _parse_response(self, *responses):
         assert len(responses) == len(self._commands) + 2; "Got wrong number of replies from pipeline"
