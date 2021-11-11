@@ -19,6 +19,9 @@ class Args:
         for part in self._parts:
             yield to_bytes(part)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
+
 
     @classmethod
     def from_dict(cls, /, mapping):
