@@ -89,6 +89,9 @@ class MultiExec:
     def __init__(self, *commands: Command):
         self._commands = commands
 
+    def __iter__(self):
+        yield from self._commands
+
     def __len__(self):
         return 2 + len(self._commands)  # MULTI cmds... EXEC
 
