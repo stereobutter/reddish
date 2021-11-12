@@ -25,6 +25,7 @@ def test_empty_Command():
     with pytest.raises(ValueError):
         Command('')
 
+
 def test_command_serialization():
     reader = hiredis.Reader()
     reader.feed(bytes(Command('SET {foo} {bar}', foo='foo', bar='bar')))
@@ -34,12 +35,12 @@ def test_command_serialization():
 @given(num=st.integers(min_value=0, max_value=1000))
 def test_multi_exec_dump(num):
     reader = hiredis.Reader()
-    tx = MultiExec(*(Command('foo') for _ in range(num)))
+    tx = MultiExec(*(Command('FOO') for _ in range(num)))
     reader.feed(bytes(tx))
 
     assert [b'MULTI'] == reader.gets()
     for _ in range(num):
-        assert [b'foo'] == reader.gets()
+        assert [b'FOO'] == reader.gets()
     assert [b'EXEC'] == reader.gets()
 
 
