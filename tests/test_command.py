@@ -17,10 +17,17 @@ def test_command_serialization():
     reader.feed(bytes(Command('SET {foo} {bar}', foo='foo', bar='bar')))
     assert [b'SET', b'foo', b'bar'] == reader.gets()
 
+
 @given(num=st.integers(min_value=0, max_value=1000))
 def test_multi_exec_dump(num):
+    reader = hiredis.Reader()
     tx = MultiExec(*(Command('foo') for _ in range(num)))
-    assert len(tx._dump()) == num + 2
+    reader.feed(bytes(tx))
+
+    assert [b'MULTI'] == reader.gets()
+    for _ in range(num):
+        assert [b'foo'] == reader.gets()
+    assert [b'EXEC'] == reader.gets()
 
 
 @given(example=type_and_value(complex_type))
