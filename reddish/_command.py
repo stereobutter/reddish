@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from itertools import chain
 from copy import copy
 from ._parser import parse, ParseError
-from ._utils import to_bytes, to_resp_array
+from ._utils import to_bytes, to_resp_array, uppercase_template_string
 from ._templating import apply_template
 
 
@@ -19,6 +19,9 @@ class Args:
         for part in self._parts:
             yield to_bytes(part)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
+
 
     @classmethod
     def from_dict(cls, /, mapping):
@@ -32,7 +35,8 @@ class Command:
 
     def __init__(self, template, *args, **kwargs):
         """Accepts strings and data to form a redis command"""
-        self._parts = apply_template(template, *args, **kwargs)
+        normalized_template = uppercase_template_string(template)
+        self._parts = apply_template(normalized_template, *args, **kwargs)
 
         for part in self._parts:
             if not isinstance(part, (int, float, str, bytes, Args)):
@@ -43,11 +47,17 @@ class Command:
         except IndexError:
             raise ValueError('An empty template string is not a valid command')
 
+        args_and_kwargs = (
+            [repr(normalized_template)] +
+            [repr(arg) for arg in args] +
+            ["{}={}".format(key, repr(value)) for key, value in kwargs.items()]
+        )
+        self._repr = f"{self.__class__.__name__}({', '.join(args_and_kwargs)})"
+
         self._models = ()
 
     def __repr__(self):
-        parts = ((part if isinstance(part, (str, bytes)) else f'`{part}`' for part in self._parts))
-        return f"""Command("{' '.join(parts)}")"""
+        return self._repr
 
     def into(self, model, /):
         """Parse the reponse into the provided type"""
@@ -93,6 +103,10 @@ class MultiExec:
 
     def __init__(self, *commands: Command):
         self._commands = commands
+
+    def __repr__(self):
+        commands = (repr(cmd) for cmd in self._commands)
+        return f"{self.__class__.__name__}({', '.join(commands)})"
 
     def __iter__(self):
         yield from self._commands
