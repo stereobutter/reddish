@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from itertools import chain
 from copy import copy
 from ._parser import parse, ParseError
-from ._utils import to_bytes, json_dumps
+from ._utils import to_bytes, to_resp_array
 from ._templating import apply_template
 
 
@@ -14,6 +14,10 @@ class Args:
             if not isinstance(part, (int, float, str, bytes)):
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
+
+    def __iter__(self):
+        for part in self._parts:
+            yield to_bytes(part)
 
 
     @classmethod
@@ -32,7 +36,7 @@ class Command:
 
         for part in self._parts:
             if not isinstance(part, (int, float, str, bytes, Args)):
-                raise ValueError(f"''{repr(part)} is not valid as part of a command")
+                raise ValueError(f"'{repr(part)}' is not valid as part of a command")
 
         self._models = ()
 
@@ -58,16 +62,18 @@ class Command:
 
         return response
 
-    def _dump_parts(self):
+    def __len__(self):
+        return 1
+
+    def __bytes__(self):
+        parts = []
         for part in self._parts:
             if isinstance(part, Args):
-                for sub_part in part._parts:
-                    yield to_bytes(sub_part)
+                for sub_part in part:
+                    parts.append(sub_part)
             else:
-                yield to_bytes(part)
-
-    def _dump(self):
-        return [self._dump_parts()]
+                parts.append(to_bytes(part))
+        return to_resp_array(*parts)
 
 
 OK = b'OK'
@@ -77,11 +83,21 @@ QUEUED = b'QUEUED'
 class MultiExec:
     """Class for wrapping commands into a redis MULTI and EXEC transaction"""
 
+    _MULTI = to_resp_array(b'MULTI')
+    _EXEC = to_resp_array(b'EXEC')
+
     def __init__(self, *commands: Command):
         self._commands = commands
 
-    def _dump(self):
-        return [[b'MULTI'], *[cmd._dump_parts() for cmd in self._commands], [b'EXEC']]
+    def __iter__(self):
+        yield from self._commands
+
+    def __len__(self):
+        return 2 + len(self._commands)  # MULTI cmds... EXEC
+
+    def __bytes__(self):
+        commands = b''.join(bytes(cmd) for cmd in self._commands)
+        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
 
     def _parse_response(self, *responses):
         assert len(responses) == len(self._commands) + 2; "Got wrong number of replies from pipeline"

@@ -10,9 +10,9 @@ def to_resp_array(*parts: bytes):
 
     for part in parts:
         request += b'$%d\r\n' % len(part)
-        request +=b'%b\r\n' % part
+        request += b'%b\r\n' % part
 
-    return request
+    return bytes(request)
 
 def to_bytes(arg: Union[str, bytes, int, float]):
     if isinstance(arg, bytes):
