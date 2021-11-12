@@ -4,7 +4,16 @@ import hypothesis.strategies as st
 import hiredis
 from .strategies import type_and_value, complex_type
 
-from reddish._command import Command, MultiExec
+from reddish._command import Args, Command, MultiExec
+
+
+def test_repr():
+    example = MultiExec(
+        Command('PING'),
+        Command('XADD {key} * {fields}', key='foo', fields=Args(['bar', 'baz'])))
+
+    eval(repr(example))
+
 
 @given(example=type_and_value(complex_type))
 def test_command_parses_data(example):
