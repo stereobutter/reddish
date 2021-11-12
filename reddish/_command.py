@@ -104,6 +104,10 @@ class MultiExec:
     def __init__(self, *commands: Command):
         self._commands = commands
 
+    def __repr__(self):
+        commands = (repr(cmd) for cmd in self._commands)
+        return f"{self.__class__.__name__}({', '.join(commands)})"
+
     def __iter__(self):
         yield from self._commands
 
