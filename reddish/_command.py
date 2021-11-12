@@ -38,6 +38,11 @@ class Command:
             if not isinstance(part, (int, float, str, bytes, Args)):
                 raise ValueError(f"'{repr(part)}' is not valid as part of a command")
 
+        try:
+            self._command_name = self._parts[0]
+        except IndexError:
+            raise ValueError('An empty template string is not a valid command')
+
         self._models = ()
 
     def __repr__(self):

@@ -9,8 +9,12 @@ from reddish._command import Command, MultiExec
 @given(example=type_and_value(complex_type))
 def test_command_parses_data(example):
     type_, value = example
-    assert value == Command('').into(type_)._parse_response(value)
+    assert value == Command('foo').into(type_)._parse_response(value)
 
+
+def test_empty_Command():
+    with pytest.raises(ValueError):
+        Command('')
 
 def test_command_serialization():
     reader = hiredis.Reader()
@@ -33,7 +37,7 @@ def test_multi_exec_dump(num):
 @given(example=type_and_value(complex_type))
 def test_multi_exec_parser(example):
     type_, value = example
-    tx = MultiExec(Command('').into(type_))
+    tx = MultiExec(Command('foo').into(type_))
 
     assert [value] == tx._parse_response(b'OK', b'QUEUED', [value])
 
