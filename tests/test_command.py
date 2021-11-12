@@ -12,6 +12,10 @@ def test_command_parses_data(example):
     assert value == Command('foo').into(type_)._parse_response(value)
 
 
+def test_empty_Command():
+    with pytest.raises(ValueError):
+        Command('')
+
 def test_command_serialization():
     reader = hiredis.Reader()
     reader.feed(bytes(Command('SET {foo} {bar}', foo='foo', bar='bar')))
