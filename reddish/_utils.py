@@ -2,6 +2,7 @@ from typing import Union, Iterable
 from itertools import islice
 from pydantic.json import pydantic_encoder
 import json
+import re
 
 def to_resp_array(*parts: bytes):
     """Builds a RESP request"""
@@ -31,3 +32,14 @@ def partition(iterable: Iterable, lenghts=Iterable[int]):
 
 def json_dumps(data):
     return json.dumps(data, default=pydantic_encoder)
+
+
+_PATTERN = re.compile(r"\{.*?}")
+
+
+def uppercase_template_string(template_string):
+    fields = _PATTERN.finditer(template_string)
+    buffer = list(template_string.upper())
+    for field in fields:
+        buffer[slice(*field.span())] = list(field.group())
+    return ''.join(buffer)
