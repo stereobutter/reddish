@@ -1,9 +1,8 @@
 from hypothesis import given, settings
-from .strategies import type_and_value, complex_type
-
-
 # functions under test
 from reddish._parser import parse
+
+from .strategies import complex_type, type_and_value
 
 
 @settings(max_examples=1000)
