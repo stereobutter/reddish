@@ -1,10 +1,11 @@
+import hiredis
+import hypothesis.strategies as st
 import pytest
 from hypothesis import given
-import hypothesis.strategies as st
-import hiredis
-from .strategies import type_and_value, complex_type
-
+# functions under test
 from reddish._command import Args, Command, MultiExec
+
+from .strategies import complex_type, type_and_value
 
 
 def test_repr():
@@ -51,18 +52,22 @@ def test_multi_exec_parser(example):
 
     assert [value] == tx._parse_response(b'OK', b'QUEUED', [value])
 
+
 @pytest.fixture
 def tx():
     return MultiExec(Command('foo'), Command('bar'))
+
 
 def test_multi_exec_error(tx):
     cause_error = Exception('cause')
     exec_error = Exception('exec aborted')
     [exec_error, cause_error] = tx._parse_response(b'OK', b'QUEUED', cause_error, exec_error)
 
+
 def test_multi_exec_wrong_num_of_responses(tx):
     with pytest.raises(AssertionError):
         tx._parse_response(b'OK', b'QUEUED', b'QUEUED', ['foo'])
+
 
 def test_multi_exec_multi_non_ok_response(tx):
     with pytest.raises(ValueError):

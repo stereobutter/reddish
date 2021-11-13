@@ -1,9 +1,8 @@
-from itertools import chain
 from trio.abc import Stream
 from hiredis import Reader
 
 from ._command import Command, MultiExec
-from ._utils import to_resp_array, partition
+from ._utils import partition
 from ._errors import ConnectionClosedError
 
 
@@ -16,7 +15,7 @@ UNSUPPORTED_COMMANDS = (
 )
 
 
-class UnsupportedCommandError(Exception): 
+class UnsupportedCommandError(Exception):
     pass
 
 
@@ -50,7 +49,7 @@ class Redis:
         output = tuple(
             cmd._parse_response(*data)
             for cmd, data in zip(commands, partition(replies, expected_num_replies))
-            )
+        )
 
         if len(output) == 1:
             return output[0]

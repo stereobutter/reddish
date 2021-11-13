@@ -22,7 +22,6 @@ class Args:
     def __repr__(self):
         return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
 
-
     @classmethod
     def from_dict(cls, /, mapping):
         if not isinstance(mapping, Mapping):
@@ -119,7 +118,7 @@ class MultiExec:
         return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
 
     def _parse_response(self, *responses):
-        assert len(responses) == len(self._commands) + 2; "Got wrong number of replies from pipeline"
+        assert len(responses) == len(self._commands) + 2, "Got wrong number of replies from pipeline"
 
         multi, *acks, replies = responses
 

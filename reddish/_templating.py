@@ -1,4 +1,3 @@
-import reddish
 from string import Formatter
 
 
@@ -33,7 +32,7 @@ def format_original_field(field_name, spec, conversion):
         f'{field_name}'
         + (f'!{conversion}' if conversion is not None else '')
         + (f':{spec}' if spec != '' else '')
-        )
+    )
 
 
 def format_error_message(missing_positional_args, missing_keyword_args):
@@ -67,7 +66,7 @@ def apply_template(format_string, *args, **kwargs):
 
         # process templated field
         if field is not None:
-            
+
             if spec != '' or conversion is not None:
                 raise ValueError(f'{format_original_field(field, spec, conversion)} is not valid as placeholder')
 

@@ -1,15 +1,18 @@
 import pytest
-from reddish._templating import parse_command_template, apply_template, format_original_field
+from reddish._templating import (
+    apply_template, format_original_field,
+    parse_command_template
+)
 
 
 def test_positional_args():
 
     assert (
         # (text, field, spec, conversion)
-        [('', 0, '', None), ('', 1, '', None)] 
+        [('', 0, '', None), ('', 1, '', None)]
         == list(parse_command_template('{}{}'))
         == list(parse_command_template('{0}{1}'))
-        )
+    )
 
 
 def test_keyword_args():
