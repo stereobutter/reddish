@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "reddish"
-version = "0.2.0"
+version = "0.2.1"
 description = "An async redis client library with a minimal api"
 keywords = ["redis"]
 authors = ["Sascha Desch <sascha.desch@hotmail.com>"]
@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://github.com/stereobutter/reddish"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7"
 trio = "^0.19.0"
 pydantic = "^1.8.2"
 hiredis = "^2.0.0"
