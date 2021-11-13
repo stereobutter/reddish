@@ -1,9 +1,8 @@
-from itertools import chain
 from trio.abc import Stream
 from hiredis import Reader
 
 from ._command import Command, MultiExec
-from ._utils import to_resp_array, partition
+from ._utils import partition
 from ._errors import ConnectionClosedError
 
 
