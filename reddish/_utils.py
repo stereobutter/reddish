@@ -48,3 +48,7 @@ def uppercase_template_string(template_string):
     for field in fields:
         buffer[slice(*field.span())] = list(field.group())
     return ''.join(buffer)
+
+
+def strip_whitespace(template_string):
+    return ' '.join(template_string.split())
