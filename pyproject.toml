@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "reddish"
-version = "0.2.1"
+version = "0.2.2"
 description = "An async redis client library with a minimal api"
 keywords = ["redis"]
 authors = ["Sascha Desch <sascha.desch@hotmail.com>"]
