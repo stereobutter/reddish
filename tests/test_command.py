@@ -16,6 +16,16 @@ def test_repr():
     eval(repr(example))
 
 
+def test_command_normalization():
+    cmd = Command(
+        """
+            hello
+            {world}
+        """, world='world')
+
+    assert ['HELLO', 'world'] == cmd._parts
+
+
 @given(example=type_and_value(complex_type))
 def test_command_parses_data(example):
     type_, value = example
