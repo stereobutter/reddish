@@ -31,7 +31,7 @@ class Redis:
         commands = (command, *commands)
 
         def guard(command):
-            if cmd._command_name in UNSUPPORTED_COMMANDS:
+            if cmd._command_name.upper() in UNSUPPORTED_COMMANDS:
                 raise UnsupportedCommandError(f"The '{cmd._command_name}' command is not supported.")
 
         for cmd in commands:
