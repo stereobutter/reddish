@@ -2,7 +2,7 @@ from collections.abc import Mapping
 from itertools import chain
 from copy import copy
 from ._parser import parse, ParseError
-from ._utils import to_bytes, to_resp_array, uppercase_template_string, strip_whitespace
+from ._utils import to_bytes, to_resp_array, strip_whitespace
 from ._templating import apply_template
 
 
@@ -34,7 +34,7 @@ class Command:
 
     def __init__(self, template, *args, **kwargs):
         """Accepts strings and data to form a redis command"""
-        normalized_template = uppercase_template_string(strip_whitespace(template))
+        normalized_template = strip_whitespace(template)
         self._parts = apply_template(normalized_template, *args, **kwargs)
 
         for part in self._parts:
