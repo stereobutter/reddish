@@ -1,5 +1,4 @@
 import json
-import re
 from itertools import islice
 from typing import Iterable, Union
 
@@ -37,17 +36,6 @@ def partition(iterable: Iterable, lenghts=Iterable[int]):
 
 def json_dumps(data):
     return json.dumps(data, default=pydantic_encoder)
-
-
-_PATTERN = re.compile(r"\{.*?}")
-
-
-def uppercase_template_string(template_string):
-    fields = _PATTERN.finditer(template_string)
-    buffer = list(template_string.upper())
-    for field in fields:
-        buffer[slice(*field.span())] = list(field.group())
-    return ''.join(buffer)
 
 
 def strip_whitespace(template_string):
