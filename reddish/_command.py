@@ -132,7 +132,7 @@ class MultiExec:
     _MULTI = to_resp_array(b'MULTI')
     _EXEC = to_resp_array(b'EXEC')
 
-    def __init__(self, *commands: Command):
+    def __init__(self, *commands: Command) -> None:
         """Create transaction from commands.
 
         Args:
@@ -140,11 +140,11 @@ class MultiExec:
         """
         self._commands = commands
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         commands = (repr(cmd) for cmd in self._commands)
         return f"{self.__class__.__name__}({', '.join(commands)})"
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Command]:
         yield from self._commands
 
     def __len__(self):
