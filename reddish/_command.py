@@ -50,7 +50,7 @@ class Args:
 class Command:
     """A redis command that can be executed against redis"""
 
-    def __init__(self, template, *args, **kwargs):
+    def __init__(self, template: str, *args: AtomicType, **kwargs: AtomicType) -> None:
         """Create redis command from template and data.
 
         Args:
@@ -78,12 +78,12 @@ class Command:
         )
         self._repr = f"{self.__class__.__name__}({', '.join(args_and_kwargs)})"
 
-        self._models = ()
+        self._models: tuple[type, ...] = ()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self._repr
 
-    def into(self, model, /):
+    def into(self, model: type, /) -> Command:
         """Create a new command with a type for parsing a response.
 
         Args:
