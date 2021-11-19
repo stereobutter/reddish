@@ -26,9 +26,11 @@ class Redis:
         self._stream = stream
         self._reader = Reader()
 
-    async def execute(self, command: Command, /, *commands: Command):
+    async def execute(self, command: Command):
+        [response] = await self.execute_many(command)
+        return response
 
-        commands = (command, *commands)
+    async def execute_many(self, *commands: Command):
 
         def guard(command):
             if cmd._command_name.upper() in UNSUPPORTED_COMMANDS:
@@ -51,10 +53,7 @@ class Redis:
             for cmd, data in zip(commands, partition(replies, expected_num_replies))
         )
 
-        if len(output) == 1:
-            return output[0]
-        else:
-            return output
+        return output
 
     async def _read_reply(self, expected=1):
         """Read and parse replies from connection.
