@@ -7,8 +7,14 @@ from ._templating import apply_template
 
 
 class Args:
+    """Container for data to be inlined into a `Command`."""
 
     def __init__(self, iterable):
+        """Inline data to from an iterable collection such as list, tuple etc.
+
+        Args:
+            iterable: collection of data to be inlined
+        """
         self._parts = []
         for part in iterable:
             if not isinstance(part, (int, float, str, bytes)):
@@ -24,6 +30,11 @@ class Args:
 
     @classmethod
     def from_dict(cls, /, mapping):
+        """Inline keys and values from a dict or other mapping.
+
+        Args:
+            mapping: dict or other mapping to inline keys and values from
+        """
         if not isinstance(mapping, Mapping):
             raise ValueError('Value is not a Mapping')
         return cls(chain.from_iterable(mapping.items()))
