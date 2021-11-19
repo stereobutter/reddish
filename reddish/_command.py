@@ -1,15 +1,22 @@
-from collections.abc import Mapping
+from __future__ import annotations
+from collections.abc import Iterable, Mapping
 from itertools import chain
 from copy import copy
+
+from typing import Union
+
 from ._parser import parse, ParseError
 from ._utils import to_bytes, to_resp_array, strip_whitespace
 from ._templating import apply_template
 
 
+AtomicType = Union[int, float, str, bytes]
+
+
 class Args:
     """Container for data to be inlined into a `Command`."""
 
-    def __init__(self, iterable):
+    def __init__(self, iterable: Iterable[AtomicType]) -> None:
         """Inline data to from an iterable collection such as list, tuple etc.
 
         Args:
@@ -21,15 +28,15 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[bytes]:
         for part in self._parts:
             yield to_bytes(part)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
 
     @classmethod
-    def from_dict(cls, /, mapping):
+    def from_dict(cls, /, mapping: Mapping[AtomicType, AtomicType]) -> Args:
         """Inline keys and values from a dict or other mapping.
 
         Args:
