@@ -41,10 +41,17 @@ class Args:
 
 
 class Command:
-    """Class for specifing a single redis command"""
+    """A redis command that can be executed against redis"""
 
     def __init__(self, template, *args, **kwargs):
-        """Accepts strings and data to form a redis command"""
+        """Create redis command from template and data.
+
+        Args:
+            template: A template string for the command that may contain
+                positional and keyword fields.
+            *args: Positional fields
+            **kwargs: Keyword fields
+        """
         normalized_template = strip_whitespace(template)
         self._parts = apply_template(normalized_template, *args, **kwargs)
 
@@ -70,7 +77,14 @@ class Command:
         return self._repr
 
     def into(self, model, /):
-        """Parse the reponse into the provided type"""
+        """Create a new command with a type for parsing a response.
+
+        Args:
+            model: type for the reponse to be parsed into
+
+        Returns:
+            A copy of the original command with the type for reponse parsing added
+        """
         new = copy(self)
         new._models = (*self._models, model)
         return new
