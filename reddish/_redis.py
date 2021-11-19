@@ -1,6 +1,8 @@
 from trio.abc import Stream
 from hiredis import Reader
 
+from typing import Union
+
 from ._command import Command, MultiExec
 from ._utils import partition
 from ._errors import ConnectionClosedError
@@ -22,14 +24,37 @@ class UnsupportedCommandError(Exception):
 class Redis:
 
     def __init__(self, stream: Stream):
-        """Redis client for executing commands over the supplied stream"""
+        """Redis client for executing commands.
+
+        Args:
+            stream: a `trio.abc.Stream` connected to a redis server.
+        """
         self._stream = stream
         self._reader = Reader()
 
-    async def execute(self, command: Command, /, *commands: Command):
+    async def execute(self, command: Union[Command, MultiExec]):
+        """Execute a single redis command.
 
-        commands = (command, *commands)
+        Args:
+            command: The command to be executed.
 
+        Returns:
+            Response from redis as received or parsed into the type
+            provided to the command.
+        """
+        [response] = await self.execute_many(command)
+        return response
+
+    async def execute_many(self, *commands: Union[Command, MultiExec]):
+        """Execute multiple redis commands at once.
+
+        Args:
+            *commands: The commands to be executed.
+
+        Returns:
+            Responses from redis as received or parsed into the types
+            provided to the commands.
+        """
         def guard(command):
             if cmd._command_name.upper() in UNSUPPORTED_COMMANDS:
                 raise UnsupportedCommandError(f"The '{cmd._command_name}' command is not supported.")
@@ -51,16 +76,13 @@ class Redis:
             for cmd, data in zip(commands, partition(replies, expected_num_replies))
         )
 
-        if len(output) == 1:
-            return output[0]
-        else:
-            return output
+        return output
 
     async def _read_reply(self, expected=1):
-        """Read and parse replies from connection.
-        ``expected`` is the amount of expected replies. In case of
-        pipelining this number is set to the amount of commands sent.
-        """
+        # Read and parse replies from connection.
+        # ``expected`` is the amount of expected replies. In case of
+        # pipelining this number is set to the amount of commands sent.
+
         replies = []
 
         while True:
