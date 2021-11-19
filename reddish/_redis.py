@@ -1,6 +1,8 @@
 from trio.abc import Stream
 from hiredis import Reader
 
+from typing import Union
+
 from ._command import Command, MultiExec
 from ._utils import partition
 from ._errors import ConnectionClosedError
@@ -30,7 +32,7 @@ class Redis:
         self._stream = stream
         self._reader = Reader()
 
-    async def execute(self, command: Command):
+    async def execute(self, command: Union[Command, MultiExec]):
         """Execute a single redis command.
 
         Args:
@@ -43,7 +45,7 @@ class Redis:
         [response] = await self.execute_many(command)
         return response
 
-    async def execute_many(self, *commands: Command):
+    async def execute_many(self, *commands: Union[Command, MultiExec]):
         """Execute multiple redis commands at once.
 
         Args:
