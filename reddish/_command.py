@@ -120,12 +120,17 @@ QUEUED = b'QUEUED'
 
 
 class MultiExec:
-    """Class for wrapping commands into a redis MULTI and EXEC transaction"""
+    """A redis MULTI and EXEC transaction"""
 
     _MULTI = to_resp_array(b'MULTI')
     _EXEC = to_resp_array(b'EXEC')
 
     def __init__(self, *commands: Command):
+        """Create transaction from commands.
+
+        Args:
+            *commands: Commands to include in the transaction
+        """
         self._commands = commands
 
     def __repr__(self):
