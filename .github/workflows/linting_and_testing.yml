@@ -19,9 +19,15 @@ jobs:
         run: poetry install
       - name: flake8
         run: poetry run flake8
+
   pytest:
     name: 'Test ${{ matrix.python }}'
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:6
+        ports:
+          - 6379:6379
     strategy:
       fail-fast: false
       matrix:
