@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 from itertools import islice
 from typing import Iterable, Union
