@@ -60,7 +60,8 @@ class Redis:
                 raise UnsupportedCommandError(f"The '{cmd._command_name}' command is not supported.")
 
         for cmd in commands:
-            if isinstance(tx := cmd, MultiExec):
+            if isinstance(cmd, MultiExec):
+                tx = cmd
                 for cmd in tx:
                     guard(cmd)
             else:

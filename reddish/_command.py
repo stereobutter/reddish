@@ -162,7 +162,8 @@ class MultiExec:
         if not multi == OK:
             raise ValueError("Got '{multi}' from MULTI instead of '{OK}' ")
 
-        if isinstance(transaction_error := replies, Exception):
+        if isinstance(replies, Exception):
+            transaction_error = replies
             causes = [(i, resp) for i, resp in enumerate(acks) if not resp == QUEUED]
             output = [transaction_error for _ in self._commands]
             for i, cause in causes:
