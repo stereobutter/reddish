@@ -36,7 +36,7 @@ class Args:
         return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
 
     @classmethod
-    def from_dict(cls, /, mapping: Mapping[AtomicType, AtomicType]) -> Args:
+    def from_dict(cls, mapping: Mapping[AtomicType, AtomicType]) -> Args:
         """Inline keys and values from a dict or other mapping.
 
         Args:
@@ -83,7 +83,7 @@ class Command:
     def __repr__(self) -> str:
         return self._repr
 
-    def into(self, model: type, /) -> Command:
+    def into(self, model: type) -> Command:
         """Create a new command with a type for parsing a response.
 
         Args:
