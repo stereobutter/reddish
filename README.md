@@ -32,7 +32,7 @@ assert b'PONG' == await redis.execute(Command('PING'))
 
 ## Usage
 
-### Commands with a fixed number of arguments
+### Command with a fixed number of arguments
 ```python
 # simple command without any arguments
 Command('PING')
@@ -44,7 +44,7 @@ Command('ECHO {}', 'hello world')
 Command('SET {key} {value}', key='foo', value=42)
 ```
 
-### Commands with response parsing
+### Command with response parsing
 ```python
 # return response unchanged from redis
 assert b'42' == await redis.execute(Command('ECHO {}', 42))
@@ -61,7 +61,7 @@ response == await redis.execute(Command('ECHO {}', data).into(Json))
 assert response == json.loads(data)
 ```
 
-### Commands with variadic arguments
+### Command with variadic arguments
 ```python
 from reddish import Args
 
@@ -75,7 +75,7 @@ Command('XADD foo * {fields}', fields=Args.from_dict(data))  # XADD foo * name b
 
 ### Pipelining commands
 ```python
-foo, bar = await redis.execute(Command('GET', 'foo'), Command('GET', 'bar'))
+foo, bar = await redis.execute_many(Command('GET', 'foo'), Command('GET', 'bar'))
 ```
 
 ### Transactions
@@ -90,5 +90,5 @@ tx = MultiExec(
 foo, bar = await redis.execute(tx)
 
 # pipelining together with transactions
-[foo, bar], baz = await redis.execute(tx, Command('ECHO {}', 'baz'))
+[foo, bar], baz = await redis.execute_many(tx, Command('ECHO {}', 'baz'))
 ```
