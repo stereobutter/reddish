@@ -37,11 +37,12 @@ def format_original_field(field_name, spec, conversion):
 
 def format_error_message(missing_positional_args, missing_keyword_args):
 
-    if n := missing_positional_args:
+    if missing_positional_args:
+        n = missing_positional_args
         return f"Command() missing {n} required positional argument{'s' if n > 1 else ''}"
 
-    if n := len(missing_keyword_args):
-
+    if missing_keyword_args:
+        n = len(missing_keyword_args)
         first, *rest = (f"'{key}'" for key in missing_keyword_args)
         if rest:
             *most, last = rest
