@@ -1,5 +1,8 @@
 # reddish - an async redis client with minimal api
 
+[![PyPI](https://img.shields.io/pypi/v/reddish?color=blue)](https://pypi.org/project/redish/)
+[![Build Status](https://shields.io/github/workflow/status/stereobutter/reddish/linting_and_testing)](https://github.com/stereobutter/reddish/actions/workflows/linting_and_testing.yml/)
+
 * [Features](#features)
 * [Installation](#installation)
 * [Minimal Example](#minimal-example)
