@@ -1,7 +1,7 @@
 import pytest
 from reddish._command import Command, MultiExec
 from reddish._sansio import RedisSansIO, ProtocolError
-from reddish._errors import UnsupportedCommandError
+from reddish._errors import UnsupportedCommandError, BrokenConnectionError
 
 
 @pytest.fixture
@@ -9,36 +9,51 @@ def redis():
     return RedisSansIO()
 
 
-def test_sending_command(redis):
-    cmd = Command('PING')
-    assert bytes(cmd) == redis.send([Command('PING')])
+@pytest.fixture
+def ping():
+    return Command('PING').into(str)
 
 
-def test_sending_multiple_commands(redis):
-    cmd = Command('PING')
-    assert 2 * bytes(cmd) == redis.send([Command('PING'), Command('PING')])
+def test_sending_command(redis, ping):
+    assert bytes(ping) == redis.send([ping])
 
 
-def test_receiving(redis):
-    redis.send([Command('PING').into(str)])
+def test_sending_multiple_commands(redis, ping):
+    assert 2 * bytes(ping) == redis.send([ping, ping])
+
+
+def test_receiving(redis, ping):
+    redis.send([ping])
     assert ['PONG'] == redis.receive(b'+PONG\r\n')
 
 
-def test_receiving_in_chunks(redis):
-    redis.send([Command('PING').into(str)])
+def test_receiving_in_chunks(redis, ping):
+    redis.send([ping])
     assert [] == redis.receive(b'+PONG')
     assert ['PONG'] == redis.receive(b'\r\n')
 
 
-def test_sending_repeatedly_should_raise(redis):
+def test_sending_repeatedly_should_raise(redis, ping):
     with pytest.raises(ProtocolError):
-        redis.send([Command('PING')])
-        redis.send([Command('PING')])
+        redis.send([ping])
+        redis.send([ping])
 
 
 def test_receiving_without_send_should_raise(redis):
     with pytest.raises(ProtocolError):
         redis.receive(b'+PONG')
+
+
+def test_broken_connection_send(redis):
+    redis.mark_broken()
+    with pytest.raises(BrokenConnectionError):
+        redis.send(ping)
+
+
+def test_broken_connection_receive(redis):
+    redis.mark_broken()
+    with pytest.raises(BrokenConnectionError):
+        redis.receive(b'')
 
 
 def test_unsupported_commands(redis):
