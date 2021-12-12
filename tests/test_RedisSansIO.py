@@ -1,7 +1,7 @@
 import pytest
 from reddish._command import Command, MultiExec
 from reddish._sansio import RedisSansIO, ProtocolError
-from reddish._errors import UnsupportedCommandError
+from reddish._errors import UnsupportedCommandError, BrokenConnectionError
 
 
 @pytest.fixture
@@ -39,6 +39,18 @@ def test_sending_repeatedly_should_raise(redis):
 def test_receiving_without_send_should_raise(redis):
     with pytest.raises(ProtocolError):
         redis.receive(b'+PONG')
+
+
+def test_broken_connection_send(redis):
+    redis.mark_broken()
+    with pytest.raises(BrokenConnectionError):
+        redis.send(ping)
+
+
+def test_broken_connection_receive(redis):
+    redis.mark_broken()
+    with pytest.raises(BrokenConnectionError):
+        redis.receive(b'')
 
 
 def test_unsupported_commands(redis):
