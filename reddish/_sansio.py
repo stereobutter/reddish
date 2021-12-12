@@ -64,12 +64,12 @@ class RedisSansIO:
         while True:
             reply = reader.gets()
             if reply is False:
-                assert not reader.has_data(), 'reader has more data but shouldnt'
-                break  # no more replies in reader
+                break  # needs more data
             else:
                 reply_buffer.append(reply)
 
         if reply_buffer.complete:
+            assert not reader.has_data(), 'reader has more data but shouldnt'
             response = reply_buffer.parse_replies()
             self._reply_buffer = None
             return response
