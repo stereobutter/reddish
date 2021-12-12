@@ -1,4 +1,4 @@
-# reddish - an async redis client with minimal api
+# reddish - an redis client for sockets and trio with minimal api
 
 * [Features](#features)
 * [Installation](#installation)
@@ -6,6 +6,8 @@
 * [Usage](#usage)
 
 ## Features
+* both sync and async API
+* sync api using the standard library `socket` module (TPC, TPC+TLS, Unix domain sockets)
 * `async`/`await` using `trio`'s stream primitives (TCP, TCP+TLS, Unix domain sockets)
 * minimal api so you don't have to relearn how to write redis commands
 * supports all redis commands including modules except `SUBSCRIBE`, `PSUBSCRIBE` and `MONITOR` [^footnote]
@@ -17,10 +19,21 @@ barring regular commands from being issued over the connection.
 
 ## Installation
 ```
+pip install reddish  # install just with support for socket
 pip install reddish[trio]  # install with support for trio
 ```
 
-## Minimal Example
+## Minimal Example - sync version
+```python
+import socket
+from reddish.socket import Redis, Command
+
+redis = Redis(socket.create_connection(('localhost', 6379)))
+
+assert b'PONG' == redis.execute(Command('PING'))
+```
+
+## Minimal Example - async version
 ```python
 import trio
 from reddish.trio import Redis, Command
