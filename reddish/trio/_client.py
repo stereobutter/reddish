@@ -52,6 +52,9 @@ class Redis:
             except (trio.BrokenResourceError, trio.ClosedResourceError):
                 redis.close()
                 raise ConnectionClosedError()
+            except trio.Cancelled:
+                redis.close()
+                raise
 
     async def execute(self, command: CommandType):
         """Execute a single redis command.
