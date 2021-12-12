@@ -1,6 +1,7 @@
 import hiredis
 from ._utils import partition
 from ._command import MultiExec
+from ._errors import UnsupportedCommandError
 
 
 class ReplyBuffer:
@@ -23,10 +24,6 @@ class ReplyBuffer:
 
 
 class ProtocolError(Exception):
-    pass
-
-
-class UnsupportedCommandError(Exception):
     pass
 
 
