@@ -17,13 +17,13 @@ barring regular commands from being issued over the connection.
 
 ## Installation
 ```
-pip install reddish
+pip install reddish[trio]  # install with support for trio
 ```
 
 ## Minimal Example
 ```python
 import trio
-from reddish import Redis, Command
+from reddish.trio import Redis, Command
 
 redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 
@@ -63,7 +63,7 @@ assert response == json.loads(data)
 
 ### Command with variadic arguments
 ```python
-from reddish import Args
+from reddish.trio import Args
 
 # inlining arguments
 Command('DEL {keys}', keys=Args(['foo', 'bar']))  # DEL foo bar
@@ -80,7 +80,7 @@ foo, bar = await redis.execute_many(Command('GET', 'foo'), Command('GET', 'bar')
 
 ### Transactions
 ```python
-from reddish import MultiExec
+from reddish.trio import MultiExec
 
 tx = MultiExec(
     Command('ECHO {}', 'foo'),
