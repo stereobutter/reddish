@@ -45,3 +45,11 @@ async def test_concurrent_requests(redis, ping):
     async with trio.open_nursery() as nursery:
         for i in range(10):
             nursery.start_soon(redis.execute, ping)
+
+
+async def test_cancellation(redis, ping):
+    with trio.move_on_after(0.0001):  # break the connection
+        await redis.execute(ping)
+
+    with pytest.raises(BrokenConnectionError):
+        await redis.execute(ping)
