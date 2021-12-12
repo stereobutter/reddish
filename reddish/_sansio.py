@@ -1,7 +1,7 @@
 import hiredis
 from ._utils import partition
 from ._command import MultiExec
-from ._errors import UnsupportedCommandError
+from ._errors import UnsupportedCommandError, ConnectionClosedError
 
 
 class ReplyBuffer:
@@ -46,6 +46,8 @@ class RedisSansIO:
         self._closed = True
 
     def send(self, commands):
+        if self._closed:
+            raise ConnectionClosedError()
         if self._reply_buffer is not None:
             raise ProtocolError('Cannot send more commands')
         for cmd in commands:
@@ -56,6 +58,8 @@ class RedisSansIO:
     def receive(self, data):
         reply_buffer = self._reply_buffer
 
+        if self._closed:
+            raise ConnectionClosedError()
         if reply_buffer is None:
             raise ProtocolError('Cannot receive replies because no commands where queued')
         reader = self._reader
