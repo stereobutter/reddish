@@ -2,6 +2,7 @@ name: pypi_release
 
 on:
   release:
+    types: [published]
 
 jobs:
   pypi_release:
