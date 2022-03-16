@@ -140,6 +140,9 @@ class MultiExec:
         """
         self._commands = commands
 
+    def add(self, *commands: Command):
+        self._commands += commands
+
     def __repr__(self) -> str:
         commands = (repr(cmd) for cmd in self._commands)
         return f"{self.__class__.__name__}({', '.join(commands)})"
