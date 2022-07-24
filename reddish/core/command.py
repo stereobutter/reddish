@@ -1,5 +1,5 @@
 from __future__ import annotations
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterator, Iterable, Mapping
 from itertools import chain
 from copy import copy
 
@@ -28,7 +28,7 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
-    def __iter__(self) -> Iterable[bytes]:
+    def __iter__(self) -> Iterator[bytes]:
         for part in self._parts:
             yield to_bytes(part)
 
