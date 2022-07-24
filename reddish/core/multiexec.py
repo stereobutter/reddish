@@ -46,7 +46,6 @@ class MultiExec:
         assert len(replies) == len(self._commands), "Got wrong number of replies from transaction"
         return [cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)]
 
-
     def __bytes__(self):
         commands = b''.join(bytes(cmd) for cmd in self._commands)
         return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
