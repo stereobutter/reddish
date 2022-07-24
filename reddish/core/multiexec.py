@@ -27,20 +27,6 @@ class MultiExec:
         """
         self._commands = commands
 
-    def __repr__(self) -> str:
-        commands = (repr(cmd) for cmd in self._commands)
-        return f"{self.__class__.__name__}({', '.join(commands)})"
-
-    def __iter__(self) -> Iterable[Command]:
-        yield from self._commands
-
-    def __len__(self):
-        return 2 + len(self._commands)  # MULTI cmds... EXEC
-
-    def __bytes__(self):
-        commands = b''.join(bytes(cmd) for cmd in self._commands)
-        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
-
     def _parse_response(self, *responses):
         assert len(responses) == len(self._commands) + 2, "Got wrong number of replies from pipeline"
 
@@ -59,3 +45,18 @@ class MultiExec:
 
         assert len(replies) == len(self._commands), "Got wrong number of replies from transaction"
         return [cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)]
+
+
+    def __bytes__(self):
+        commands = b''.join(bytes(cmd) for cmd in self._commands)
+        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
+
+    def __repr__(self) -> str:
+        commands = (repr(cmd) for cmd in self._commands)
+        return f"{self.__class__.__name__}({', '.join(commands)})"
+
+    def __iter__(self) -> Iterable[Command]:
+        yield from self._commands
+
+    def __len__(self):
+        return 2 + len(self._commands)  # MULTI cmds... EXEC
