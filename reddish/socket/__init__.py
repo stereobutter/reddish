@@ -1,2 +1,2 @@
 from ._client import Redis  # noqa
-from .._command import Args, Command, MultiExec  # noqa
+from reddish.core import Args, Command, MultiExec  # noqa

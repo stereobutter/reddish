@@ -1,5 +1,5 @@
 import pytest
-from reddish._command import Command, MultiExec
+from reddish.core import Command, MultiExec
 from reddish._sansio import RedisSansIO, ProtocolError
 from reddish._errors import UnsupportedCommandError, BrokenConnectionError
 
