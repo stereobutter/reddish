@@ -80,9 +80,6 @@ class Command:
 
         self._models: tuple[type, ...] = ()
 
-    def __repr__(self) -> str:
-        return self._repr
-
     def into(self, model: type) -> Command:
         """Create a new command with a type for parsing a response.
 
@@ -110,6 +107,9 @@ class Command:
 
     def __len__(self):
         return 1
+
+    def __repr__(self) -> str:
+        return self._repr
 
     def __bytes__(self):
         parts = []
