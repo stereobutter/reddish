@@ -1,6 +1,6 @@
 import hiredis
 from ._utils import partition
-from ._command import MultiExec
+from .core import MultiExec
 from ._errors import UnsupportedCommandError, BrokenConnectionError
 
 

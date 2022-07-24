@@ -3,7 +3,7 @@ import hypothesis.strategies as st
 import pytest
 from hypothesis import given
 # functions under test
-from reddish._command import Args, Command, MultiExec
+from reddish.core import Args, Command, MultiExec
 
 from .strategies import complex_type, type_and_value
 

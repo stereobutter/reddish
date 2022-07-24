@@ -1,13 +1,13 @@
 from __future__ import annotations
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterator, Iterable, Mapping
 from itertools import chain
 from copy import copy
 
 from typing import Union
 
-from ._parser import parse, ParseError
-from ._utils import to_bytes, to_resp_array, strip_whitespace
-from ._templating import apply_template
+from reddish._parser import parse, ParseError
+from reddish._utils import to_bytes, to_resp_array, strip_whitespace
+from reddish._templating import apply_template
 
 
 AtomicType = Union[int, float, str, bytes]
@@ -28,7 +28,7 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
-    def __iter__(self) -> Iterable[bytes]:
+    def __iter__(self) -> Iterator[bytes]:
         for part in self._parts:
             yield to_bytes(part)
 
@@ -80,9 +80,6 @@ class Command:
 
         self._models: tuple[type, ...] = ()
 
-    def __repr__(self) -> str:
-        return self._repr
-
     def into(self, model: type) -> Command:
         """Create a new command with a type for parsing a response.
 
@@ -111,6 +108,9 @@ class Command:
     def __len__(self):
         return 1
 
+    def __repr__(self) -> str:
+        return self._repr
+
     def __bytes__(self):
         parts = []
         for part in self._parts:
@@ -120,55 +120,3 @@ class Command:
             else:
                 parts.append(to_bytes(part))
         return to_resp_array(*parts)
-
-
-OK = b'OK'
-QUEUED = b'QUEUED'
-
-
-class MultiExec:
-    """A redis MULTI and EXEC transaction"""
-
-    _MULTI = to_resp_array(b'MULTI')
-    _EXEC = to_resp_array(b'EXEC')
-
-    def __init__(self, *commands: Command) -> None:
-        """Create transaction from commands.
-
-        Args:
-            *commands: Commands to include in the transaction
-        """
-        self._commands = commands
-
-    def __repr__(self) -> str:
-        commands = (repr(cmd) for cmd in self._commands)
-        return f"{self.__class__.__name__}({', '.join(commands)})"
-
-    def __iter__(self) -> Iterable[Command]:
-        yield from self._commands
-
-    def __len__(self):
-        return 2 + len(self._commands)  # MULTI cmds... EXEC
-
-    def __bytes__(self):
-        commands = b''.join(bytes(cmd) for cmd in self._commands)
-        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
-
-    def _parse_response(self, *responses):
-        assert len(responses) == len(self._commands) + 2, "Got wrong number of replies from pipeline"
-
-        multi, *acks, replies = responses
-
-        if not multi == OK:
-            raise ValueError("Got '{multi}' from MULTI instead of '{OK}' ")
-
-        if isinstance(replies, Exception):
-            transaction_error = replies
-            causes = [(i, resp) for i, resp in enumerate(acks) if not resp == QUEUED]
-            output = [transaction_error for _ in self._commands]
-            for i, cause in causes:
-                output[i] = cause
-            return output
-
-        assert len(replies) == len(self._commands), "Got wrong number of replies from transaction"
-        return [cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)]
