@@ -3,21 +3,21 @@ from collections.abc import Iterable
 
 from typing import Union
 
-from reddish._utils import to_resp_array
-from reddish.core.command import Command
+from .utils import to_resp_array
+from .command import Command
 
 AtomicType = Union[int, float, str, bytes]
 
 
-OK = b'OK'
-QUEUED = b'QUEUED'
+OK = b"OK"
+QUEUED = b"QUEUED"
 
 
 class MultiExec:
     """A redis MULTI and EXEC transaction"""
 
-    _MULTI = to_resp_array(b'MULTI')
-    _EXEC = to_resp_array(b'EXEC')
+    _MULTI = to_resp_array(b"MULTI")
+    _EXEC = to_resp_array(b"EXEC")
 
     def __init__(self, *commands: Command) -> None:
         """Create transaction from commands.
@@ -28,7 +28,9 @@ class MultiExec:
         self._commands = commands
 
     def _parse_response(self, *responses):
-        assert len(responses) == len(self._commands) + 2, "Got wrong number of replies from pipeline"
+        assert (
+            len(responses) == len(self._commands) + 2
+        ), "Got wrong number of replies from pipeline"
 
         multi, *acks, replies = responses
 
@@ -43,12 +45,16 @@ class MultiExec:
                 output[i] = cause
             return output
 
-        assert len(replies) == len(self._commands), "Got wrong number of replies from transaction"
-        return [cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)]
+        assert len(replies) == len(
+            self._commands
+        ), "Got wrong number of replies from transaction"
+        return [
+            cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)
+        ]
 
     def __bytes__(self):
-        commands = b''.join(bytes(cmd) for cmd in self._commands)
-        return b'%b%b%b' % (self._MULTI, commands, self._EXEC)
+        commands = b"".join(bytes(cmd) for cmd in self._commands)
+        return b"%b%b%b" % (self._MULTI, commands, self._EXEC)
 
     def __repr__(self) -> str:
         commands = (repr(cmd) for cmd in self._commands)

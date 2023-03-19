@@ -3,7 +3,7 @@ import pytest
 from concurrent.futures import ThreadPoolExecutor
 
 from reddish.socket import Redis, Command
-from reddish._errors import BrokenConnectionError
+from reddish._core.errors import BrokenConnectionError
 
 
 @pytest.fixture
@@ -13,7 +13,7 @@ def unconnected_socket():
 
 @pytest.fixture
 def connected_socket(unconnected_socket):
-    unconnected_socket.connect(('localhost', 6379))
+    unconnected_socket.connect(("localhost", 6379))
     yield unconnected_socket
     unconnected_socket.close()
 
@@ -25,15 +25,15 @@ def redis(connected_socket):
 
 @pytest.fixture
 def ping():
-    return Command('PING').into(str)
+    return Command("PING").into(str)
 
 
 def test_execute(redis, ping):
-    'PONG' == redis.execute(ping)
+    "PONG" == redis.execute(ping)
 
 
 def test_execute_many(redis, ping):
-    ['PONG', 'PONG'] == redis.execute_many(ping, ping)
+    ["PONG", "PONG"] == redis.execute_many(ping, ping)
 
 
 def test_stream(unconnected_socket):

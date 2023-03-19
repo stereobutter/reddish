@@ -19,6 +19,8 @@ jobs:
         run: pdm install 
       - name: flake8
         run: pdm run flake8 src/reddish
+      - name: black
+        run: pdm run black src --check
 
   pytest:
     name: 'Test ${{ matrix.python }}'
