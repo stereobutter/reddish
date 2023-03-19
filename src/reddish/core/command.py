@@ -43,7 +43,7 @@ class Args:
             mapping: dict or other mapping to inline keys and values from
         """
         if not isinstance(mapping, Mapping):
-            raise ValueError('Value is not a Mapping')
+            raise ValueError("Value is not a Mapping")
         return cls(chain.from_iterable(mapping.items()))
 
 
@@ -69,12 +69,12 @@ class Command:
         try:
             self._command_name = self._parts[0]
         except IndexError:
-            raise ValueError('An empty template string is not a valid command')
+            raise ValueError("An empty template string is not a valid command")
 
         args_and_kwargs = (
-            [repr(normalized_template)] +
-            [repr(arg) for arg in args] +
-            ["{}={}".format(key, repr(value)) for key, value in kwargs.items()]
+            [repr(normalized_template)]
+            + [repr(arg) for arg in args]
+            + ["{}={}".format(key, repr(value)) for key, value in kwargs.items()]
         )
         self._repr = f"{self.__class__.__name__}({', '.join(args_and_kwargs)})"
 

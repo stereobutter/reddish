@@ -7,7 +7,6 @@ from .._typing import CommandType
 
 
 class Redis:
-
     def __init__(self, stream: socket.socket):
         """Redis client for executing commands.
 
@@ -46,7 +45,7 @@ class Redis:
 
                 while True:
                     data = stream.recv(4096)
-                    if data == b'':
+                    if data == b"":
                         raise BrokenConnectionError()
                     replies = redis.receive(data)
                     if replies:

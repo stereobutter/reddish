@@ -9,7 +9,6 @@ from .._typing import CommandType
 
 
 class Redis:
-
     def __init__(self, stream: trio.abc.Stream) -> None:
         """Redis client for executing commands.
 
@@ -44,7 +43,7 @@ class Redis:
 
                 while True:
                     data = await stream.receive_some()
-                    if data == b'':
+                    if data == b"":
                         raise BrokenConnectionError()
                     replies = redis.receive(data)
                     if replies:

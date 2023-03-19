@@ -2,9 +2,9 @@ from string import Formatter
 
 
 def parse_command_template(format_string):
-
     auto_numbering_error = ValueError(
-        'cannot switch from automatic field numbering to manual field specification')
+        "cannot switch from automatic field numbering to manual field specification"
+    )
 
     index = 0
     auto_numbering = None
@@ -17,7 +17,7 @@ def parse_command_template(format_string):
                     raise auto_numbering_error
                 auto_numbering = False
 
-            if field_name == '':
+            if field_name == "":
                 if auto_numbering is False:
                     raise auto_numbering_error
                 auto_numbering = True
@@ -29,17 +29,18 @@ def parse_command_template(format_string):
 
 def format_original_field(field_name, spec, conversion):
     return (
-        f'{field_name}'
-        + (f'!{conversion}' if conversion is not None else '')
-        + (f':{spec}' if spec != '' else '')
+        f"{field_name}"
+        + (f"!{conversion}" if conversion is not None else "")
+        + (f":{spec}" if spec != "" else "")
     )
 
 
 def format_error_message(missing_positional_args, missing_keyword_args):
-
     if missing_positional_args:
         n = missing_positional_args
-        return f"Command() missing {n} required positional argument{'s' if n > 1 else ''}"
+        return (
+            f"Command() missing {n} required positional argument{'s' if n > 1 else ''}"
+        )
 
     if missing_keyword_args:
         n = len(missing_keyword_args)
@@ -53,23 +54,22 @@ def format_error_message(missing_positional_args, missing_keyword_args):
 
 
 def apply_template(format_string, *args, **kwargs):
-
     missing_positional_args = 0
     missing_keyword_args = set()
 
     data = []
     for literal_text, field, spec, conversion in parse_command_template(format_string):
-
         # extract literal commands
-        for command in literal_text.strip().split(' '):
+        for command in literal_text.strip().split(" "):
             if command:
                 data.append(command)
 
         # process templated field
         if field is not None:
-
-            if spec != '' or conversion is not None:
-                raise ValueError(f'{format_original_field(field, spec, conversion)} is not valid as placeholder')
+            if spec != "" or conversion is not None:
+                raise ValueError(
+                    f"{format_original_field(field, spec, conversion)} is not valid as placeholder"
+                )
 
             if isinstance(field, int):  # positonal argument
                 try:
@@ -87,6 +87,8 @@ def apply_template(format_string, *args, **kwargs):
             data.append(value)
 
     if missing_positional_args or missing_keyword_args:
-        raise TypeError(format_error_message(missing_positional_args, missing_keyword_args))
+        raise TypeError(
+            format_error_message(missing_positional_args, missing_keyword_args)
+        )
 
     return data
