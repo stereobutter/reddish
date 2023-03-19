@@ -1,7 +1,9 @@
 import hiredis
+from outcome import capture, Error
+
 from .utils import partition
 from .multiexec import MultiExec
-from .errors import UnsupportedCommandError, ConnectionError
+from .errors import UnsupportedCommandError, ConnectionError, PipelineError
 
 
 class ReplyBuffer:
@@ -19,9 +21,16 @@ class ReplyBuffer:
 
     def parse_replies(self):
         replies = partition(self._buffer, self._expected_replies)
-        return [
-            cmd._parse_response(*reply) for cmd, reply in zip(self._commands, replies)
-        ]
+
+        outcomes = tuple(
+            capture(cmd._parse_response, *reply)
+            for cmd, reply in zip(self._commands, replies)
+        )
+
+        if any(isinstance(outcome, Error) for outcome in outcomes):
+            raise PipelineError(outcomes)
+        else:
+            return [outcome.unwrap() for outcome in outcomes]
 
 
 class ProtocolError(Exception):
@@ -75,9 +84,8 @@ class RedisSansIO:
 
         if reply_buffer.complete:
             assert not reader.has_data(), "reader has more data but shouldnt"
-            response = reply_buffer.parse_replies()
             self._reply_buffer = None
-            return response
+            return reply_buffer.parse_replies()
         else:
             return []
 

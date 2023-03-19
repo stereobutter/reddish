@@ -3,8 +3,12 @@ from collections.abc import Iterable
 
 from typing import Union
 
+from outcome import capture, Value, Error
+from hiredis import ReplyError
+
 from .utils import to_resp_array
 from .command import Command
+from .errors import CommandError, TransactionError
 
 AtomicType = Union[int, float, str, bytes]
 
@@ -37,20 +41,28 @@ class MultiExec:
         if not multi == OK:
             raise ValueError("Got '{multi}' from MULTI instead of '{OK}' ")
 
-        if isinstance(replies, Exception):
-            transaction_error = replies
-            causes = [(i, resp) for i, resp in enumerate(acks) if not resp == QUEUED]
-            output = [transaction_error for _ in self._commands]
-            for i, cause in causes:
-                output[i] = cause
-            return output
+        if isinstance(replies, ReplyError):
+            error = CommandError(str(replies))
+            for resp in acks:
+                if not resp == QUEUED:
+                    break
+            failed_ack = next(resp for resp in acks if resp != QUEUED)
+            cause = CommandError(str(failed_ack))
+            raise error from cause
 
         assert len(replies) == len(
             self._commands
         ), "Got wrong number of replies from transaction"
-        return [
-            cmd._parse_response(reply) for cmd, reply in zip(self._commands, replies)
-        ]
+
+        outcomes = tuple(
+            capture(cmd._parse_response, reply)
+            for cmd, reply in zip(self._commands, replies)
+        )
+
+        if any(isinstance(outcome, Error) for outcome in outcomes):
+            raise TransactionError(outcomes)
+        else:
+            return [outcome.unwrap() for outcome in outcomes]
 
     def __bytes__(self):
         commands = b"".join(bytes(cmd) for cmd in self._commands)
