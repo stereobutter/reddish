@@ -7,7 +7,7 @@ from hiredis import ReplyError
 
 # functions under test
 from reddish._core import Args, Command, MultiExec
-from reddish._core.errors import CommandError, TransactionError
+from reddish._core.errors import CommandError, TransactionError, ParseError
 
 from .strategies import complex_type, type_and_value
 
@@ -25,6 +25,16 @@ def test_repr():
 def test_command_parses_data(example):
     type_, value = example
     assert value == Command("foo").into(type_)._parse_response(value)
+
+
+def test_command_parsing_fails():
+    with pytest.raises(ParseError):
+        try:
+            Command("foo").into(int)._parse_response("hello")
+        except ParseError as error:
+            assert error.reply == "hello"
+            assert error.type is int
+            raise
 
 
 def test_empty_Command():

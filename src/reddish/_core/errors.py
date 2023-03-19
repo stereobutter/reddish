@@ -20,6 +20,26 @@ class CommandError(Exception):
         self.code, self.message = str(reply).split(maxsplit=1)
 
 
+class ParseError(Exception):
+    """Raised for commands where reply does not parse successfully.
+
+    The original reply and the type that it failed to be parsed into as attributed
+    `.reply` and `.type`
+    """
+
+    def __init__(self, reply, type):
+        self._reply = reply
+        self._type = type
+
+    @property
+    def reply(self):
+        return self._reply
+
+    @property
+    def type(self):
+        return self._type
+
+
 class PipelineError(Exception):
     """Raised when one or more pipelined commands resulted in an error.
 
