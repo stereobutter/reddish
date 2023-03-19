@@ -60,6 +60,16 @@ Command('ECHO {}', 'hello world')
 Command('SET {key} {value}', key='foo', value=42)
 ```
 
+### Catching invalid commands
+```python
+from reddish import CommandError
+
+try:
+    await redis.execute(Command("foo"))
+except CommandError as error:
+    print(error.message)  # >>> ERR unknown command `foo`, with args beginning with:
+```
+
 ### Command with response parsing
 ```python
 # return response unchanged from redis
@@ -67,6 +77,14 @@ assert b'42' == await redis.execute(Command('ECHO {}', 42))
 
 # parse response as type
 assert 42 == await redis.execute(Command('ECHO {}', 42).into(int))
+
+# handling replies that won't parse correctly
+from reddish import ParseError
+
+try:
+    await redis.execute(Command('PING').into(int))
+except ParseError as error:
+    print(error.reply)
 
 # use any type that works with pydantic
 from pydantic import Json
@@ -92,6 +110,23 @@ Command('XADD foo * {fields}', fields=Args.from_dict(data))  # XADD foo * name b
 ### Pipelining commands
 ```python
 foo, bar = await redis.execute_many(Command('GET', 'foo'), Command('GET', 'bar'))
+
+# handling errors in a pipeline
+from reddish import PipelineError
+
+try:
+    foo, bar = await redis.execute_many(*commands)
+except PipelineError as error:
+    for outcome in error.outcomes:
+        try:
+            # either returns the reply if it was successful 
+            # or raises the original exception if not
+            value = outcome.unwrap() 
+            ...
+        except CommandError:
+            ...
+        except ParseError:
+            ...
 ```
 
 ### Transactions
@@ -105,6 +140,44 @@ tx = MultiExec(
 
 foo, bar = await redis.execute(tx)
 
+# handling errors with transactions
+try:
+    await redis.execute(some_tx)
+except CommandError as error:
+    # The exception as a whole failed and redis replied with an EXECABORT error
+    cause = error.__cause__  # original CommandError that caused the EXECABORT
+    print(f'Exception aborted due to {cause.code}:{cause.message}')
+except TransactionError as error:
+    # Some command inside the transaction failed 
+    # but the transaction as a whole succeeded
+    # to get at the partial results of the transaction and the errors 
+    # you can iterate over the outcomes of the transaction
+    for outcome in error.outcomes:
+        try:
+            outcome.unwrap()  # get the value or raise the original error
+        except CommandError:
+            ...
+        except ParseError:
+            ...
+
+
 # pipelining together with transactions
 [foo, bar], baz = await redis.execute_many(tx, Command('ECHO {}', 'baz'))
+
+# handling errors with transactions inside a pipeline
+try:
+    res: list[int] = await redis.execute_many(*cmds)
+except PipelineError as error:
+    # handle the outcomes of the pipeline
+    for outcome in error.outcomes:
+        try:
+            outcome.unwrap()
+        except CommandError:
+            ...
+        except ParseError:
+            ...
+        except TransactionError as tx_error:
+            # handle errors inside the transaction
+            for tx_outcome in tx_error.outcomes:
+                ...
 ```

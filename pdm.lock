@@ -268,7 +268,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.1"
-content_hash = "sha256:c9ba9a76fdfdbba3f3bbaaca9f3998f67de2556eb51bbb5e68041c67afe810bf"
+content_hash = "sha256:a28db939e85248a75a75c6f5635170e78f0f024d183811c33a3f79711e9b0487"
 
 [metadata.files]
 "async-generator 1.10" = [

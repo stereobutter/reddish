@@ -3,7 +3,7 @@ try:
 except ImportError:
     raise ImportError("Execute 'pip install reddish[trio]' to enable trio support")
 from reddish._core.sansio import RedisSansIO
-from reddish._core.errors import BrokenConnectionError
+from reddish._core.errors import ConnectionError
 
 from reddish._core.typing import CommandType
 
@@ -44,13 +44,13 @@ class Redis:
                 while True:
                     data = await stream.receive_some()
                     if data == b"":
-                        raise BrokenConnectionError()
+                        raise ConnectionError()
                     replies = redis.receive(data)
                     if replies:
                         return replies
             except (trio.BrokenResourceError, trio.ClosedResourceError):
                 redis.mark_broken()
-                raise BrokenConnectionError()
+                raise ConnectionError()
             except trio.Cancelled:
                 redis.mark_broken()
                 raise

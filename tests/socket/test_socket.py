@@ -3,7 +3,7 @@ import pytest
 from concurrent.futures import ThreadPoolExecutor
 
 from reddish.socket import Redis, Command
-from reddish._core.errors import BrokenConnectionError
+from reddish._core.errors import ConnectionError
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def test_stream(unconnected_socket):
 def test_closed_connection(connected_socket, ping):
     redis = Redis(connected_socket)
     connected_socket.close()
-    with pytest.raises(BrokenConnectionError):
+    with pytest.raises(ConnectionError):
         redis.execute(ping)
 
 
