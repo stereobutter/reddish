@@ -19,6 +19,9 @@ class CommandError(Exception):
     def __init__(self, reply: str):
         self.code, self.message = str(reply).split(maxsplit=1)
 
+    def __str__(self):
+        return f"{self.code} {self.message}"
+
 
 class ParseError(Exception):
     """Raised for commands where reply does not parse successfully.
@@ -38,6 +41,9 @@ class ParseError(Exception):
     @property
     def type(self):
         return self._type
+
+    def __str__(self):
+        return f"{self.reply} cannot be parsed into {self.type}"
 
 
 class PipelineError(Exception):
