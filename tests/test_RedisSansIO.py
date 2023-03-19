@@ -1,7 +1,8 @@
 import pytest
+from outcome import Error, Value
 from reddish._core import Command, MultiExec
 from reddish._core.sansio import RedisSansIO, ProtocolError
-from reddish._core.errors import UnsupportedCommandError, ConnectionError
+from reddish._core.errors import UnsupportedCommandError, ConnectionError, PipelineError
 
 
 @pytest.fixture
@@ -64,3 +65,16 @@ def test_unsupported_commands(redis):
 def test_unsupported_commands_in_transaction(redis):
     with pytest.raises(UnsupportedCommandError):
         redis.send([MultiExec(Command("SUBSCRIBE foo"))])
+
+
+def test_errors_in_pipeline(redis):
+    with pytest.raises(PipelineError):
+        try:
+            redis.send([Command("PING"), Command("bar")])
+            redis.receive(b"+PONG\r\n")
+            redis.receive(b"-Error message\r\n")
+        except PipelineError as error:
+            assert len(error.outcomes) == 2
+            first_reply, second_reply = error.outcomes
+            assert isinstance(first_reply, Value) and isinstance(second_reply, Error)
+            raise
