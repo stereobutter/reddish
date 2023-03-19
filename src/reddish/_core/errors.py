@@ -1,7 +1,3 @@
-from outcome import Outcome
-from typing import Iterable
-
-
 class ConnectionError(Exception):
     """Raised when the underlying connection closed or failed."""
 
@@ -31,11 +27,12 @@ class PipelineError(Exception):
     iterated over by iterating this exception.
     """
 
-    def __init__(self, outcomes: Iterable[Outcome]):
+    def __init__(self, outcomes):
         self._outcomes = outcomes
 
-    def __iter__(self):
-        yield from self._outcomes
+    @property
+    def outcomes(self):
+        return self._outcomes
 
 
 class TransactionError(Exception):
@@ -46,8 +43,9 @@ class TransactionError(Exception):
     iterated over by iterating this exception.
     """
 
-    def __init__(self, outcomes: Iterable[Outcome]):
+    def __init__(self, outcomes):
         self._outcomes = outcomes
 
-    def __iter__(self):
-        yield from self._outcomes
+    @property
+    def outcomes(self):
+        return self._outcomes
