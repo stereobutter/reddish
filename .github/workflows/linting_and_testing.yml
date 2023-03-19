@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: pdm install 
       - name: flake8
-        run: pdm run flake8
+        run: pdm run flake8 src/reddish
 
   pytest:
     name: 'Test ${{ matrix.python }}'
