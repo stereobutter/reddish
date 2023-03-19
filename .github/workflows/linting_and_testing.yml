@@ -13,12 +13,12 @@ jobs:
         uses: actions/setup-python@v2.2.2
         with:
           python-version: 3.9
-      - name: Python Poetry Action
-        uses: abatilo/actions-poetry@v2.1.4
-      - name: setup environment
-        run: poetry install
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v3
+      - name: Install dependencies
+        run: pdm install 
       - name: flake8
-        run: poetry run flake8
+        run: pdm run flake8
 
   pytest:
     name: 'Test ${{ matrix.python }}'
@@ -42,9 +42,9 @@ jobs:
         uses: actions/setup-python@v2.2.2
         with:
           python-version: '${{ matrix.python }}'
-      - name: Python Poetry Action
-        uses: abatilo/actions-poetry@v2.1.4
-      - name: setup environment
-        run: poetry install
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v3
+      - name: Install dependencies
+        run: pdm install 
       - name: pytest
-        run: poetry run pytest
+        run: pdm run pytest
