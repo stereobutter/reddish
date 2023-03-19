@@ -3,7 +3,7 @@ from collections.abc import Iterable
 
 from typing import Union
 
-from outcome import capture, Value, Error
+from outcome import capture, Error
 from hiredis import ReplyError
 
 from .utils import to_resp_array

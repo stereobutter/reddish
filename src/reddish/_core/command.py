@@ -6,7 +6,7 @@ from copy import copy
 from typing import Union
 from hiredis import ReplyError
 
-from .parser import parse, ParseError
+from .parser import parse
 from .utils import to_bytes, to_resp_array, strip_whitespace
 from .templating import apply_template
 from .errors import CommandError
@@ -96,7 +96,6 @@ class Command:
         return new
 
     def _parse_response(self, response):
-
         if isinstance(response, ReplyError):
             raise CommandError(str(response)) from None
 
