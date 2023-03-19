@@ -2,7 +2,7 @@ import trio
 import pytest_trio
 import pytest
 from reddish.trio import Redis, Command
-from reddish._core.errors import BrokenConnectionError
+from reddish._core.errors import ConnectionError
 
 
 @pytest_trio.trio_fixture
@@ -37,7 +37,7 @@ async def test_closed_connection(connection, ping):
     async with await connection as stream:
         redis = Redis(stream)
 
-    with pytest.raises(BrokenConnectionError):
+    with pytest.raises(ConnectionError):
         await redis.execute(ping)
 
 
@@ -51,5 +51,5 @@ async def test_cancellation(redis, ping):
     with trio.move_on_after(0.0001):  # break the connection
         await redis.execute(ping)
 
-    with pytest.raises(BrokenConnectionError):
+    with pytest.raises(ConnectionError):
         await redis.execute(ping)

@@ -1,7 +1,7 @@
 import hiredis
 from .utils import partition
 from .multiexec import MultiExec
-from .errors import UnsupportedCommandError, BrokenConnectionError
+from .errors import UnsupportedCommandError, ConnectionError
 
 
 class ReplyBuffer:
@@ -46,7 +46,7 @@ class RedisSansIO:
 
     def send(self, commands):
         if self._broken:
-            raise BrokenConnectionError()
+            raise ConnectionError()
         if self._reply_buffer is not None:
             raise ProtocolError("Cannot send more commands")
         for cmd in commands:
@@ -58,7 +58,7 @@ class RedisSansIO:
         reply_buffer = self._reply_buffer
 
         if self._broken:
-            raise BrokenConnectionError()
+            raise ConnectionError()
         if reply_buffer is None:
             raise ProtocolError(
                 "Cannot receive replies because no commands where queued"

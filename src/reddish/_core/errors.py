@@ -2,7 +2,9 @@ from outcome import Outcome
 from typing import Iterable
 
 
-class BrokenConnectionError(Exception):
+class ConnectionError(Exception):
+    """Raised when the underlying connection closed or failed."""
+
     def __init__(self, msg="Connection closed.", *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
