@@ -1,29 +1,30 @@
-[tool.poetry]
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.2.2",
+    "hypothesis>=6.70.0",
+    "pytest-trio>=0.8.0",
+    "flake8>=5.0.4",
+]
+
+[project]
 name = "reddish"
 version = "0.4.0"
-description = "An async redis client library with a minimal api"
-keywords = ["redis"]
-authors = ["Sascha Desch <sascha.desch@hotmail.com>"]
-license = "MIT"
+description = "Friendly redis client library with minimal API"
+authors = [
+    {name = "sascha.desch@hotmail.com", email = "sascha.desch@hotmail.com"},
+]
+dependencies = [
+    "hiredis>=2.2.2",
+    "pydantic>=1.10.6",
+]
+requires-python = ">=3.7"
 readme = "README.md"
-repository = "https://github.com/stereobutter/reddish"
+license = {text = "MIT"}
 
-[tool.poetry.dependencies]
-python = "^3.7"
-trio = {version="^0.19.0", optional=true}
-pydantic = "^1.8.2"
-hiredis = "^2.0.0"
-
-[tool.poetry.extras]
-trio = ["trio"]
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
-hypothesis = "^6.17.1"
-pytest-trio = "^0.7.0"
-flake8 = "^4.0.1"
-mypy = "^0.910"
+[project.optional-dependencies]
+trio = [ 'trio >= 0.19.0' ]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517>=1.0"]
+build-backend = "pdm.pep517.api"
