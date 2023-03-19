@@ -1,7 +1,7 @@
 import hiredis
-from ._utils import partition
-from .core import MultiExec
-from ._errors import UnsupportedCommandError, BrokenConnectionError
+from .utils import partition
+from .multiexec import MultiExec
+from .errors import UnsupportedCommandError, BrokenConnectionError
 
 
 class ReplyBuffer:

@@ -3,8 +3,8 @@ from collections.abc import Iterable
 
 from typing import Union
 
-from reddish._utils import to_resp_array
-from reddish.core.command import Command
+from .utils import to_resp_array
+from .command import Command
 
 AtomicType = Union[int, float, str, bytes]
 

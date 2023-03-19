@@ -5,9 +5,9 @@ from copy import copy
 
 from typing import Union
 
-from reddish._parser import parse, ParseError
-from reddish._utils import to_bytes, to_resp_array, strip_whitespace
-from reddish._templating import apply_template
+from .parser import parse, ParseError
+from .utils import to_bytes, to_resp_array, strip_whitespace
+from .templating import apply_template
 
 
 AtomicType = Union[int, float, str, bytes]

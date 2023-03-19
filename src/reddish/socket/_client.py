@@ -1,9 +1,9 @@
 import socket
 import threading
-from .._sansio import RedisSansIO
-from .._errors import BrokenConnectionError
+from reddish._core.sansio import RedisSansIO
+from reddish._core.errors import BrokenConnectionError
 
-from .._typing import CommandType
+from reddish._core.typing import CommandType
 
 
 class Redis:
