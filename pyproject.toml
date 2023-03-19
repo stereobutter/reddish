@@ -8,6 +8,7 @@ dev = [
     "hypothesis>=6.70.0",
     "pytest-trio>=0.8.0",
     "flake8>=5.0.4",
+    "black>=23.1.0",
 ]
 
 [project]
