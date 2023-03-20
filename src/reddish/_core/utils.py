@@ -42,3 +42,15 @@ def json_dumps(data):
 
 def strip_whitespace(template_string):
     return " ".join(template_string.split())
+
+
+def get_subcommand(command, index):
+    try:
+        part = command._parts[index]
+    except IndexError:
+        return None
+    else:
+        if isinstance(part, str):
+            return part.upper()
+        else:
+            return None
