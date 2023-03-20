@@ -2,7 +2,6 @@ import hiredis
 from outcome import capture, Error
 
 from .utils import partition
-from .multiexec import MultiExec
 from .errors import ConnectionError, PipelineError
 from .supported_commands import check_for_unsupported_commands
 
@@ -53,11 +52,7 @@ class RedisSansIO:
         if self._reply_buffer is not None:
             raise ProtocolError("Cannot send more commands")
         for cmd in commands:
-            if isinstance(cmd, MultiExec):
-                for sub_command in cmd:
-                    check_for_unsupported_commands(sub_command)
-            else:
-                check_for_unsupported_commands(cmd)
+            check_for_unsupported_commands(cmd)
         self._reply_buffer = ReplyBuffer(commands)
         return b"".join(bytes(cmd) for cmd in commands)
 
