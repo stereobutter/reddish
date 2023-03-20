@@ -40,8 +40,11 @@ class ProtocolError(Exception):
 class RedisSansIO:
     UNSUPPORTED_COMMANDS = (
         "SUBSCRIBE",
-        "UNSUBSCRIBE" "PSUBSCRIBE",
+        "UNSUBSCRIBE",
+        "PSUBSCRIBE",
         "PUNSUBSCRIBE",
+        "SSUBSCRIBE",
+        "SUNSUBSCRIBE",
         "MONITOR",
     )
 
