@@ -4,10 +4,10 @@ from itertools import chain
 from copy import copy
 
 from typing import Union
-from hiredis import ReplyError
+from hiredis import ReplyError, pack_command
 
 from .parser import parse
-from .utils import to_bytes, to_resp_array, strip_whitespace
+from .utils import strip_whitespace
 from .templating import apply_template
 from .errors import CommandError
 
@@ -30,9 +30,8 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
-    def __iter__(self) -> Iterator[bytes]:
-        for part in self._parts:
-            yield to_bytes(part)
+    def __iter__(self) -> Iterator[AtomicType]:
+        yield from self._parts
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
@@ -120,5 +119,5 @@ class Command:
                 for sub_part in part:
                     parts.append(sub_part)
             else:
-                parts.append(to_bytes(part))
-        return to_resp_array(*parts)
+                parts.append(part)
+        return pack_command(tuple(parts))
