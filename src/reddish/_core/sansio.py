@@ -1,27 +1,31 @@
 import hiredis
 from outcome import capture, Error
 
+from typing import Iterable, Any
+
 from .utils import partition
 from .errors import ConnectionError, PipelineError
 from .supported_commands import check_for_unsupported_commands
+
+from .typing import CommandType
 
 NOT_ENOUGH_DATA = object()
 
 
 class ReplyBuffer:
-    def __init__(self, commands):
+    def __init__(self, commands: Iterable[CommandType]):
         self._commands = commands
         self._expected_replies = [len(cmd) for cmd in commands]
-        self._buffer = []
+        self._buffer: list[Any] = []
 
-    def append(self, reply):
+    def append(self, reply: Any) -> None:
         self._buffer.append(reply)
 
     @property
-    def complete(self):
+    def complete(self) -> bool:
         return len(self._buffer) == sum(self._expected_replies)
 
-    def parse_replies(self):
+    def parse_replies(self) -> Any:
         replies = partition(self._buffer, self._expected_replies)
 
         outcomes = tuple(
@@ -48,7 +52,7 @@ class RedisSansIO:
     def mark_broken(self):
         self._broken = True
 
-    def send(self, commands):
+    def send(self, commands: Iterable[CommandType]) -> bytes:
         if self._broken:
             raise ConnectionError()
         if self._reply_buffer is not None:
@@ -58,7 +62,7 @@ class RedisSansIO:
         self._reply_buffer = ReplyBuffer(commands)
         return b"".join(bytes(cmd) for cmd in commands)
 
-    def receive(self, data):
+    def receive(self, data: bytes) -> Any:
         reply_buffer = self._reply_buffer
 
         if self._broken:

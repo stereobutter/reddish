@@ -1,7 +1,6 @@
 from __future__ import annotations
-from collections.abc import Iterable
 
-from typing import Union
+from typing import Union, Iterator
 
 from outcome import capture, Error
 from hiredis import ReplyError, pack_command
@@ -71,7 +70,7 @@ class MultiExec:
         commands = (repr(cmd) for cmd in self._commands)
         return f"{self.__class__.__name__}({', '.join(commands)})"
 
-    def __iter__(self) -> Iterable[Command]:
+    def __iter__(self) -> Iterator[Command]:
         yield from self._commands
 
     def __len__(self):
