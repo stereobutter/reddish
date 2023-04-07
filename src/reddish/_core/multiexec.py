@@ -4,9 +4,8 @@ from collections.abc import Iterable
 from typing import Union
 
 from outcome import capture, Error
-from hiredis import ReplyError
+from hiredis import ReplyError, pack_command
 
-from .utils import to_resp_array
 from .command import Command
 from .errors import CommandError, TransactionError
 
@@ -20,8 +19,8 @@ QUEUED = b"QUEUED"
 class MultiExec:
     """A redis MULTI and EXEC transaction"""
 
-    _MULTI = to_resp_array(b"MULTI")
-    _EXEC = to_resp_array(b"EXEC")
+    _MULTI = pack_command((b"MULTI",))
+    _EXEC = pack_command((b"EXEC",))
 
     def __init__(self, *commands: Command) -> None:
         """Create transaction from commands.
