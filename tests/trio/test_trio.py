@@ -1,7 +1,8 @@
 import trio
 import pytest_trio
 import pytest
-from reddish.trio import Redis, Command
+from reddish.trio import Redis
+from reddish import Command
 from reddish._core.errors import ConnectionError
 
 
