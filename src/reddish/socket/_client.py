@@ -1,6 +1,6 @@
 import socket
 import threading
-from reddish._core.sansio import RedisSansIO
+from reddish._core.sansio import RedisSansIO, NOT_ENOUGH_DATA
 from reddish._core.errors import ConnectionError
 
 from reddish._core.typing import CommandType
@@ -48,7 +48,9 @@ class Redis:
                     if data == b"":
                         raise ConnectionError()
                     replies = redis.receive(data)
-                    if replies:
+                    if replies is NOT_ENOUGH_DATA:
+                        continue
+                    else:
                         return replies
             except OSError:
                 redis.mark_broken()
