@@ -49,8 +49,8 @@ async def test_concurrent_requests(redis, ping):
 
 
 async def test_cancellation(redis, ping):
-    with trio.move_on_after(0.0001):  # break the connection
-        await redis.execute(ping)
+    # instructs redis server to close connection
+    await redis.execute(Command("QUIT"))
 
     with pytest.raises(ConnectionError):
         await redis.execute(ping)
