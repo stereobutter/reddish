@@ -29,7 +29,8 @@ pip install reddish[trio]  # install with support for trio
 ## Minimal Example - sync version
 ```python
 import socket
-from reddish.socket import Redis, Command
+from reddish import Command
+from reddish.socket import Redis
 
 redis = Redis(socket.create_connection(('localhost', 6379)))
 
@@ -39,7 +40,7 @@ assert b'PONG' == redis.execute(Command('PING'))
 ## Minimal Example - async version
 ```python
 import trio
-from reddish.trio import Redis, Command
+from reddish.trio import Redis
 
 redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 
@@ -97,7 +98,7 @@ assert response == json.loads(data)
 
 ### Command with variadic arguments
 ```python
-from reddish.trio import Args
+from reddish import Args
 
 # inlining arguments
 Command('DEL {keys}', keys=Args(['foo', 'bar']))  # DEL foo bar
@@ -131,7 +132,7 @@ except PipelineError as error:
 
 ### Transactions
 ```python
-from reddish.trio import MultiExec
+from reddish import MultiExec
 
 tx = MultiExec(
     Command('ECHO {}', 'foo'),
