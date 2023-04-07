@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import json
 from itertools import islice
 from typing import Iterable, Generator, Tuple, Union
-
-from pydantic.json import pydantic_encoder
 
 
 def partition(
@@ -13,10 +10,6 @@ def partition(
     iterator = iter(iterable)
     for length in lenghts:
         yield tuple(islice(iterator, length))
-
-
-def json_dumps(data):
-    return json.dumps(data, default=pydantic_encoder)
 
 
 def strip_whitespace(template_string: str) -> str:
