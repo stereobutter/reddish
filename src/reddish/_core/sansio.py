@@ -5,6 +5,8 @@ from .utils import partition
 from .errors import ConnectionError, PipelineError
 from .supported_commands import check_for_unsupported_commands
 
+NOT_ENOUGH_DATA = object()
+
 
 class ReplyBuffer:
     def __init__(self, commands):
@@ -39,7 +41,7 @@ class ProtocolError(Exception):
 
 class RedisSansIO:
     def __init__(self, reader=None):
-        self._reader = reader or hiredis.Reader()
+        self._reader = reader or hiredis.Reader(notEnoughData=NOT_ENOUGH_DATA)
         self._reply_buffer = None
         self._broken = False
 
@@ -70,8 +72,8 @@ class RedisSansIO:
 
         while True:
             reply = reader.gets()
-            if reply is False:
-                break  # needs more data
+            if reply is NOT_ENOUGH_DATA:
+                break  # no more complete replies in the reader
             else:
                 reply_buffer.append(reply)
 
@@ -80,4 +82,4 @@ class RedisSansIO:
             self._reply_buffer = None
             return reply_buffer.parse_replies()
         else:
-            return []
+            return NOT_ENOUGH_DATA

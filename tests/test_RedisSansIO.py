@@ -1,7 +1,7 @@
 import pytest
 from outcome import Error, Value
 from reddish._core import Command, MultiExec
-from reddish._core.sansio import RedisSansIO, ProtocolError
+from reddish._core.sansio import RedisSansIO, ProtocolError, NOT_ENOUGH_DATA
 from reddish._core.errors import UnsupportedCommandError, ConnectionError, PipelineError
 
 
@@ -30,7 +30,7 @@ def test_receiving(redis, ping):
 
 def test_receiving_in_chunks(redis, ping):
     redis.send([ping])
-    assert [] == redis.receive(b"+PONG")
+    assert redis.receive(b"+PONG") is NOT_ENOUGH_DATA
     assert ["PONG"] == redis.receive(b"\r\n")
 
 
