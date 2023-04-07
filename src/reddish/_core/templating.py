@@ -1,7 +1,11 @@
 from string import Formatter
+from typing import Generator, Union, Tuple, Set, Any
 
 
-def parse_command_template(format_string):
+FormatInfo = Tuple[str, Union[int, str, None], Union[str, None], Union[str, None]]
+
+
+def parse_command_template(format_string: str) -> Generator[FormatInfo, None, None]:
     auto_numbering_error = ValueError(
         "cannot switch from automatic field numbering to manual field specification"
     )
@@ -27,7 +31,9 @@ def parse_command_template(format_string):
         yield literal_text, field_name, spec, conversion
 
 
-def format_original_field(field_name, spec, conversion):
+def format_original_field(
+    field_name: Union[str, int], spec: Union[str, None], conversion: Union[str, None]
+):
     return (
         f"{field_name}"
         + (f"!{conversion}" if conversion is not None else "")
@@ -35,14 +41,16 @@ def format_original_field(field_name, spec, conversion):
     )
 
 
-def format_error_message(missing_positional_args, missing_keyword_args):
+def format_error_message(
+    missing_positional_args: int, missing_keyword_args: Set[str]
+) -> str:
     if missing_positional_args:
         n = missing_positional_args
         return (
             f"Command() missing {n} required positional argument{'s' if n > 1 else ''}"
         )
 
-    if missing_keyword_args:
+    elif missing_keyword_args:
         n = len(missing_keyword_args)
         first, *rest = (f"'{key}'" for key in missing_keyword_args)
         if rest:
@@ -51,9 +59,11 @@ def format_error_message(missing_positional_args, missing_keyword_args):
         else:
             missing_fields = first
         return f"Command() missing {n} required keyword-only argument{'s' if n > 1 else ''}: {missing_fields}"
+    else:
+        assert False, "malformed info about missing arguments encountered"
 
 
-def apply_template(format_string, *args, **kwargs):
+def apply_template(format_string: str, *args: Any, **kwargs: Any) -> list:
     missing_positional_args = 0
     missing_keyword_args = set()
 
