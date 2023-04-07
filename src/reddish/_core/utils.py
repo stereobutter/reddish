@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import json
 from itertools import islice
-from typing import Iterable
+from typing import Iterable, Generator, Tuple
 
 from pydantic.json import pydantic_encoder
 
 
-def partition(iterable: Iterable, lenghts=Iterable[int]):
+def partition(
+    iterable: Iterable, lenghts: Iterable[int]
+) -> Generator[Tuple, None, None]:
     iterator = iter(iterable)
     for length in lenghts:
         yield tuple(islice(iterator, length))
