@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  flake8:
+  linters:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,6 +21,8 @@ jobs:
         run: pdm run flake8 src/reddish
       - name: black
         run: pdm run black src --check
+      - name: pyright
+        run: pdm run pyright src
 
   pytest:
     name: 'Test ${{ matrix.python }}'
