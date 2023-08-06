@@ -30,7 +30,7 @@ pip install reddish[trio]  # install with support for trio
 ```python
 import socket
 from reddish import Command
-from reddish.socket import Redis
+from reddish.backends.socket import Redis
 
 redis = Redis(socket.create_connection(('localhost', 6379)))
 
@@ -40,7 +40,7 @@ assert b'PONG' == redis.execute(Command('PING'))
 ## Minimal Example - async version
 ```python
 import trio
-from reddish.trio import Redis
+from reddish.backends.trio import Redis
 
 redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 
