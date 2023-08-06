@@ -6,7 +6,7 @@ groups = ["default", "trio", "dev"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:c8ba170939bdb0fbdc57d4151d38684214a4ffbadaf11f9bc8fed7da878937fc"
+content_hash = "sha256:27b74eede59db8c6a7080bdcb9b974873327f8e142a36255e502033e7636b131"
 
 [[package]]
 name = "async-generator"
@@ -601,6 +601,20 @@ dependencies = [
 files = [
     {file = "trio-0.22.0-py3-none-any.whl", hash = "sha256:f1dd0780a89bfc880c7c7994519cb53f62aacb2c25ff487001c0052bd721cdf0"},
     {file = "trio-0.22.0.tar.gz", hash = "sha256:ce68f1c5400a47b137c5a4de72c7c901bd4e7a24fbdebfe9b41de8c6c04eaacf"},
+]
+
+[[package]]
+name = "trio-typing"
+version = "0.8.0"
+summary = "Static type checking support for Trio and related projects"
+dependencies = [
+    "mypy-extensions>=0.4.2",
+    "trio>=0.16.0",
+    "typing-extensions>=3.7.4",
+]
+files = [
+    {file = "trio-typing-0.8.0.tar.gz", hash = "sha256:f14264a27b45cec5dabd25b686255ac7d841984200c54b2057bc98a099318a97"},
+    {file = "trio_typing-0.8.0-py3-none-any.whl", hash = "sha256:3734fa3f61cab047fdc97aa0030c72e910455cf85f18ca18c3ff336781b144bb"},
 ]
 
 [[package]]
