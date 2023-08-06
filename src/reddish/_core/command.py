@@ -1,24 +1,24 @@
 from __future__ import annotations
-from collections.abc import Iterator, Iterable, Mapping
+from collections.abc import Mapping
 from itertools import chain
 from copy import copy
 
-from typing import Union
 from hiredis import ReplyError, pack_command
 
 from .parser import parse
 from .utils import strip_whitespace
 from .templating import apply_template
 from .errors import CommandError
+from typing import TypeVar, Generic
 
 
-AtomicType = Union[int, float, str, bytes]
+T = TypeVar("T")
 
 
 class Args:
     """Container for data to be inlined into a `Command`."""
 
-    def __init__(self, iterable: Iterable[AtomicType]) -> None:
+    def __init__(self, iterable):
         """Inline data to from an iterable collection such as list, tuple etc.
 
         Args:
@@ -30,14 +30,14 @@ class Args:
                 raise ValueError(f"''{repr(part)} is not a valid argument")
             self._parts.append(part)
 
-    def __iter__(self) -> Iterator[AtomicType]:
+    def __iter__(self):
         yield from self._parts
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return f"{self.__class__.__name__}([{', '.join(repr(part) for part in self._parts)}])"
 
     @classmethod
-    def from_dict(cls, mapping: Mapping[AtomicType, AtomicType]) -> Args:
+    def from_dict(cls, mapping):
         """Inline keys and values from a dict or other mapping.
 
         Args:
@@ -48,10 +48,10 @@ class Args:
         return cls(chain.from_iterable(mapping.items()))
 
 
-class Command:
+class Command(Generic[T]):  # must inherit from Generic[T] to be subscribable at runtime
     """A redis command that can be executed against redis"""
 
-    def __init__(self, template: str, *args: AtomicType, **kwargs: AtomicType) -> None:
+    def __init__(self, template, *args, **kwargs):
         """Create redis command from template and data.
 
         Args:
@@ -81,7 +81,7 @@ class Command:
 
         self._models: tuple[type, ...] = ()
 
-    def into(self, model: type) -> Command:
+    def into(self, model):
         """Create a new command with a type for parsing a response.
 
         Args:
@@ -109,7 +109,7 @@ class Command:
     def __len__(self):
         return 1
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return self._repr
 
     def __bytes__(self):
