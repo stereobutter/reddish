@@ -3,8 +3,6 @@ import threading
 from reddish._core.sansio import RedisSansIO, NOT_ENOUGH_DATA
 from reddish._core.errors import ConnectionError
 
-from reddish._core.typing import CommandType
-
 
 class Redis:
     def __init__(self, stream: socket.socket):
@@ -24,7 +22,7 @@ class Redis:
         self._lock = threading.Lock()
         self._redis = RedisSansIO()
 
-    def execute_many(self, *commands: CommandType):
+    def execute_many(self, *commands):
         """Execute multiple redis commands at once.
 
         Args:
@@ -56,7 +54,7 @@ class Redis:
                 redis.mark_broken()
                 raise ConnectionError()
 
-    def execute(self, command: CommandType):
+    def execute(self, command):
         """Execute a single redis command.
 
         Args:

@@ -5,8 +5,6 @@ except ImportError:
 from reddish._core.sansio import RedisSansIO, NOT_ENOUGH_DATA
 from reddish._core.errors import ConnectionError
 
-from reddish._core.typing import CommandType
-
 
 class Redis:
     def __init__(self, stream: trio.abc.Stream) -> None:
@@ -22,7 +20,7 @@ class Redis:
         self._lock = trio.Lock()
         self._redis = RedisSansIO()
 
-    async def execute_many(self, *commands: CommandType):
+    async def execute_many(self, *commands):
         """Execute multiple redis commands at once.
 
         Args:
@@ -57,7 +55,7 @@ class Redis:
                 redis.mark_broken()
                 raise
 
-    async def execute(self, command: CommandType):
+    async def execute(self, command):
         """Execute a single redis command.
 
         Args:
