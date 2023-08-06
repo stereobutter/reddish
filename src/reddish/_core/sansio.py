@@ -1,15 +1,18 @@
 import hiredis
 from outcome import capture, Error
 
-from typing import Iterable, Any
+from typing import Iterable, Any, Union
 
 from .utils import partition
 from .errors import ConnectionError, PipelineError
 from .supported_commands import check_for_unsupported_commands
 
-from .typing import CommandType
+from reddish._core.command import Command
+from reddish._core.multiexec import MultiExec
 
 NOT_ENOUGH_DATA = object()
+
+CommandType = Union[Command, MultiExec]
 
 
 class ReplyBuffer:

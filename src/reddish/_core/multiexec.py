@@ -1,27 +1,28 @@
 from __future__ import annotations
 
-from typing import Union, Iterator
-
 from outcome import capture, Error
 from hiredis import ReplyError, pack_command
 
-from .command import Command
 from .errors import CommandError, TransactionError
 
-AtomicType = Union[int, float, str, bytes]
+from typing import TypeVar, Generic
 
+
+T = TypeVar("T")
 
 OK = b"OK"
 QUEUED = b"QUEUED"
 
 
-class MultiExec:
+class MultiExec(
+    Generic[T]
+):  # must inherit from Generic[T] to be subscribable at runtime
     """A redis MULTI and EXEC transaction"""
 
     _MULTI = pack_command((b"MULTI",))
     _EXEC = pack_command((b"EXEC",))
 
-    def __init__(self, *commands: Command) -> None:
+    def __init__(self, *commands):
         """Create transaction from commands.
 
         Args:
@@ -66,11 +67,11 @@ class MultiExec:
         commands = b"".join(bytes(cmd) for cmd in self._commands)
         return b"%b%b%b" % (self._MULTI, commands, self._EXEC)
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         commands = (repr(cmd) for cmd in self._commands)
         return f"{self.__class__.__name__}({', '.join(commands)})"
 
-    def __iter__(self) -> Iterator[Command]:
+    def __iter__(self):
         yield from self._commands
 
     def __len__(self):
