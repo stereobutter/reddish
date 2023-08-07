@@ -1,6 +1,6 @@
 import anyio
 import pytest
-from reddish.backends.anyio import Redis
+from reddish.clients.anyio import Redis
 from reddish import Command
 from reddish._core.errors import ConnectionError
 

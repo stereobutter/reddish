@@ -1,7 +1,6 @@
 # reddish - a friendly redis client with sync and async api
 
 [![PyPI](https://img.shields.io/pypi/v/reddish?color=blue)](https://pypi.org/project/reddish/)
-[![Build Status](https://shields.io/github/workflow/status/stereobutter/reddish/linting_and_testing)](https://github.com/stereobutter/reddish/actions/workflows/linting_and_testing.yml/)
 
 * [Features](#features)
 * [Installation](#installation)
@@ -10,15 +9,16 @@
 
 ## Features
 * both sync and async API
-* sync api using the standard library `socket` module (TPC, TPC+TLS, Unix domain sockets)
-* `async`/`await` using `asyncio`'s, `trio`'s or `anyio`'s stream primitives (TCP, TCP+TLS, Unix domain sockets)
-* minimal api so you don't have to relearn how to write redis commands
-* supports all redis commands including modules except `SUBSCRIBE`, `PSUBSCRIBE` and `MONITOR` [^footnote]
-* parses responses back into python types if you like (powered by [pydantic](https://github.com/samuelcolvin/pydantic))
+* *bring your own connection* - supports TCP, TCP+TLS and Unix domain sockets
+* supports multiple networking libaries and event loops
+    * sync API using the standard library `socket` module
+    * async API using `asyncio`'s, `trio`'s or `anyio`'s stream primitives
+* minimal API so you don't have to relearn how to write redis commands
+* supports allmost every redis command (including modules) except for `SUBSCRIBE`, `PSUBSCRIBE`, `SSUBSCRIBE`, `MONITOR` and `CLIENT TRACKING` [^footnote]
+* parses replies into python types if you like (powered by [pydantic](https://github.com/samuelcolvin/pydantic))
 * works with every redis version and supports both `RESP2`and `RESP3` protocols
 
-[^footnote]: Commands like `SUBSCRIBE` or `MONITOR` take over the redis connection for listeting to new events 
-barring regular commands from being issued over the connection. 
+[^footnote]: Commands like `SUBSCRIBE` or `MONITOR` take over the redis connection for listening to new events barring regular commands from being issued over the connection. 
 
 ## Installation
 ```
@@ -31,7 +31,7 @@ pip install reddish[anyio]  # install with support for anyio
 ```python
 import socket
 from reddish import Command
-from reddish.backends.socket import Redis
+from reddish.clients.socket import Redis
 
 redis = Redis(socket.create_connection(('localhost', 6379)))
 
@@ -41,7 +41,7 @@ assert b'PONG' == redis.execute(Command('PING'))
 ## Minimal Example - async version (asyncio)
 ```python
 import asyncio
-from reddish.backends.asyncio import Redis
+from reddish.clients.asyncio import Redis
 
 redis = Redis(await asyncio.open_connection('localhost', 6379))
 
@@ -51,7 +51,7 @@ assert b'PONG' == await redis.execute(Command('PING'))
 ## Minimal Example - async version (trio)
 ```python
 import trio
-from reddish.backends.trio import Redis
+from reddish.clients.trio import Redis
 
 redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 
@@ -82,7 +82,7 @@ Command('ECHO {}', 'hello world')
 Command('SET {key} {value}', key='foo', value=42)
 ```
 
-### Catching invalid commands
+### Handling invalid commands
 ```python
 from reddish import CommandError
 
@@ -92,7 +92,7 @@ except CommandError as error:
     print(error.message)  # >>> ERR unknown command `foo`, with args beginning with:
 ```
 
-### Command with response parsing
+### Parsing replies
 ```python
 # return response unchanged from redis
 assert b'42' == await redis.execute(Command('ECHO {}', 42))
@@ -117,7 +117,7 @@ response == await redis.execute(Command('ECHO {}', data).into(Json))
 assert response == json.loads(data)
 ```
 
-### Command with variadic arguments
+### Commands with variadic arguments
 ```python
 from reddish import Args
 
