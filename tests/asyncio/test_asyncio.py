@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 import pytest_asyncio
-from reddish.backends.asyncio import Redis
+from reddish.clients.asyncio import Redis
 from reddish import Command
 from reddish._core.errors import ConnectionError
 

@@ -31,7 +31,7 @@ pip install reddish[anyio]  # install with support for anyio
 ```python
 import socket
 from reddish import Command
-from reddish.backends.socket import Redis
+from reddish.clients.socket import Redis
 
 redis = Redis(socket.create_connection(('localhost', 6379)))
 
@@ -41,7 +41,7 @@ assert b'PONG' == redis.execute(Command('PING'))
 ## Minimal Example - async version (asyncio)
 ```python
 import asyncio
-from reddish.backends.asyncio import Redis
+from reddish.clients.asyncio import Redis
 
 redis = Redis(await asyncio.open_connection('localhost', 6379))
 
@@ -51,7 +51,7 @@ assert b'PONG' == await redis.execute(Command('PING'))
 ## Minimal Example - async version (trio)
 ```python
 import trio
-from reddish.backends.trio import Redis
+from reddish.clients.trio import Redis
 
 redis = Redis(await trio.open_tcp_stream('localhost', 6379))
 

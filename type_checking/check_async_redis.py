@@ -1,5 +1,5 @@
 from reddish import Command, MultiExec
-from reddish.backends._client_stubs import AsyncRedis as Redis
+from reddish.clients._client_stubs import AsyncRedis as Redis
 from typing import assert_type
 
 

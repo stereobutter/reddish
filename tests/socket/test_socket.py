@@ -2,7 +2,7 @@ import socket
 import pytest
 from concurrent.futures import ThreadPoolExecutor
 
-from reddish.backends.socket import Redis
+from reddish.clients.socket import Redis
 from reddish import Command
 from reddish._core.errors import ConnectionError
 
