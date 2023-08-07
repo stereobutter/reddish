@@ -14,7 +14,7 @@
     * sync API using the standard library `socket` module
     * async API using `asyncio`'s, `trio`'s or `anyio`'s stream primitives
 * minimal API so you don't have to relearn how to write redis commands
-* supports all redis commands (including modules) except for `SUBSCRIBE`, `PSUBSCRIBE` and `MONITOR` and `CLIENT TRACKING` [^footnote]
+* supports allmost every redis command (including modules) except for `SUBSCRIBE`, `PSUBSCRIBE`, `SSUBSCRIBE`, `MONITOR` and `CLIENT TRACKING` [^footnote]
 * parses replies into python types if you like (powered by [pydantic](https://github.com/samuelcolvin/pydantic))
 * works with every redis version and supports both `RESP2`and `RESP3` protocols
 
@@ -92,7 +92,7 @@ except CommandError as error:
     print(error.message)  # >>> ERR unknown command `foo`, with args beginning with:
 ```
 
-### Command with response parsing
+### Parsing replies
 ```python
 # return response unchanged from redis
 assert b'42' == await redis.execute(Command('ECHO {}', 42))
@@ -117,7 +117,7 @@ response == await redis.execute(Command('ECHO {}', data).into(Json))
 assert response == json.loads(data)
 ```
 
-### Command with variadic arguments
+### Commands with variadic arguments
 ```python
 from reddish import Args
 
