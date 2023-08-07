@@ -34,6 +34,9 @@ trio = [
     'trio >= 0.19.0',
     "trio-typing>=0.8.0",
 ]
+anyio = [
+    "anyio>=3.7.1",
+]
 
 [build-system]
 requires = ["pdm-pep517>=1.0"]

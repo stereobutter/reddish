@@ -2,11 +2,27 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default", "trio", "dev"]
+groups = ["default", "trio", "dev", "anyio"]
 cross_platform = true
 static_urls = false
 lock_version = "4.3"
-content_hash = "sha256:f5c8b843273d76c9602f40ed181e337eb7bf10d657bf5db99146aa1576adc78c"
+content_hash = "sha256:96ca21385be7b0c57c173db7975c7b2ad8e35055ee0af4aa442a4fb93a86ea75"
+
+[[package]]
+name = "anyio"
+version = "3.7.1"
+requires_python = ">=3.7"
+summary = "High level compatibility layer for multiple asynchronous event loop implementations"
+dependencies = [
+    "exceptiongroup; python_version < \"3.11\"",
+    "idna>=2.8",
+    "sniffio>=1.1",
+    "typing-extensions; python_version < \"3.8\"",
+]
+files = [
+    {file = "anyio-3.7.1-py3-none-any.whl", hash = "sha256:91dee416e570e92c64041bd18b900d1d6fa78dff7048769ce5ac5ddad004fbb5"},
+    {file = "anyio-3.7.1.tar.gz", hash = "sha256:44a3c9aba0f5defa43261a8b3efb97891f2bd7d804e0e1f56419befa1adfc780"},
+]
 
 [[package]]
 name = "async-generator"
