@@ -11,7 +11,7 @@
 ## Features
 * both sync and async API
 * sync api using the standard library `socket` module (TPC, TPC+TLS, Unix domain sockets)
-* `async`/`await` using `trio`'s stream primitives (TCP, TCP+TLS, Unix domain sockets)
+* `async`/`await` using `asyncio`'s or `trio`'s stream primitives (TCP, TCP+TLS, Unix domain sockets)
 * minimal api so you don't have to relearn how to write redis commands
 * supports all redis commands including modules except `SUBSCRIBE`, `PSUBSCRIBE` and `MONITOR` [^footnote]
 * parses responses back into python types if you like (powered by [pydantic](https://github.com/samuelcolvin/pydantic))
@@ -22,7 +22,7 @@ barring regular commands from being issued over the connection.
 
 ## Installation
 ```
-pip install reddish  # install just with support for socket
+pip install reddish  # install just with support for socket and asyncio
 pip install reddish[trio]  # install with support for trio
 ```
 
@@ -37,7 +37,17 @@ redis = Redis(socket.create_connection(('localhost', 6379)))
 assert b'PONG' == redis.execute(Command('PING'))
 ```
 
-## Minimal Example - async version
+## Minimal Example - async version (asyncio)
+```python
+import asyncio
+from reddish.backends.asyncio import Redis
+
+redis = Redis(await asyncio.open_connection('localhost', 6379))
+
+assert b'PONG' == await redis.execute(Command('PING'))
+```
+
+## Minimal Example - async version (trio)
 ```python
 import trio
 from reddish.backends.trio import Redis
